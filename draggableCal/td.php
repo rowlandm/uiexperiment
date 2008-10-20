@@ -37,29 +37,19 @@ if($blkCount==0){
   
 
 <style>
-.blk {background: black; width: 100px;  font-size: 10px; font-family: Arial;color:white;margin-left:2px;padding:1px }
+.blk {background: black; width: 100px;  font-size: 10px; font-family: Arial;color:white;margin-left:1px;padding:1px }
 .ui-selected { background: #CFD499; color: black;}
-.ui-selecting { background: #727EA3;margin:0px;}
+.ui-selecting { background: #727EA3;}
 td {background: #CFD4E6; width: 100px;  font-size: 10px; font-family: Arial;}
 </style>
-
-<!--
-<style>
-ul { list-style: none; margin:0px; margin-left:-30px;}
-.ui-selected { background: #727EA3; color: #FFF; }
-.ui-selecting { background: #CFD499; }
-li { background: #CFD4E6; width: 100px; margin-top: 5px; font-size: 10px; font-family: Arial; padding-top: 3px; }
-.fakedLi { background: #CFD4E6; width: 100px; margin-top: 5px; margin-left:10px; font-size: 10px; font-family: Arial; padding-top: 3px; }
-</style>
--->
 
 </head>
 <body>
 <script src="jquery-ui-personalized-1.6rc2.min.js"></script>
 
-<div style='display: table-cell'>
-
-		<table id="timeslotsLbl" height='100%'>
+<div style='display: table-cell;'>
+&nbsp;
+		<table id="timeslotsLbl" cellspacing='1px' cellpadding='1'>
 		<?php
 		foreach($timeslotArray as $value){
 		?>
@@ -70,9 +60,9 @@ li { background: #CFD4E6; width: 100px; margin-top: 5px; font-size: 10px; font-f
 		</table>
 
 </div>
-<div style='display: table-cell'>		
-		
-		<table class="ava" id="timeslots0" height='100%'>
+<div style='display: table-cell;'>		
+&nbsp;
+		<table class="ava" id="timeslots0" cellspacing='1px' cellpadding='1'>
 		<?php
 		$nBlocked=0;
 		$timeslotArray = timeslotArray("08:00","13:30","15","24");
@@ -82,7 +72,7 @@ li { background: #CFD4E6; width: 100px; margin-top: 5px; font-size: 10px; font-f
 		?>
 			</table>
 			<div class='blk'><?php echo $value;?></div>
-			<table class="ava" id="timeslots<?php echo $nBlocked;?>">
+			<table class="ava" id="timeslots<?php echo $nBlocked;?>" cellspacing='1px' cellpadding='1'>
 		<?php
 			}else{
 		?>
@@ -99,7 +89,6 @@ li { background: #CFD4E6; width: 100px; margin-top: 5px; font-size: 10px; font-f
 <script>
 function merge(tableName,className){
 	var spanedHeight = 0;
-	var spanedMargin = 0;
 	var toBeDel = [];
 	var idFirst="";
 	var count = 0;
@@ -122,8 +111,18 @@ function merge(tableName,className){
 	for(var i=0;i<toBeDel.length;i++){
 		document.getElementById('tr'+toBeDel[i]).deleteCell(document.getElementById(toBeDel[i]).cellIndex);
 	}
-	spanedHeight = spanedHeight + spanedMargin;
+	idFirst.rowSpan=count;
+	spanedHeight = spanedHeight+count-1;
 	idFirst.height=spanedHeight+'px';
+	idFirst.style.padding='0px';
+	
+	new_element = document.createElement("input");
+	new_element.setAttribute("type", "text");
+	new_element.setAttribute("name", "element_name");
+	new_element.setAttribute("id", "element_id");
+	new_element.setAttribute("value", "element_value");
+	//document.forms['form_name'].appendChild(new_element); 
+	
 }
 </script>
 		
