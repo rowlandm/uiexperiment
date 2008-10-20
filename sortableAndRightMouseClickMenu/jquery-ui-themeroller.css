@@ -464,6 +464,7 @@ table.ui-datepicker .ui-datepicker-title-row td a {
 .ui-autocomplete-results ul, .ui-autocomplete-results li {
 	margin: 0; 
 	padding: 0; 
+	background: grey;
 	list-style: none;
 }
 .ui-autocomplete-results ul {

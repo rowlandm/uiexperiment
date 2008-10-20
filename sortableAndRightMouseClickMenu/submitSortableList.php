@@ -12,12 +12,10 @@ $DB = NewADOConnection('mysql');
 $DB->Connect($server, $user, $pwd, $db);
 
 $postList = $_POST['list'];
+$postListName = $_POST['list_name'];
 
 
 
-if ($postList == ""){
-	die("FAILURE:No list to save.");
-}
 
 include("adodb/adodb-active-record.inc.php");
 ADOdb_Active_Record::SetDatabaseAdapter($DB);
@@ -36,15 +34,23 @@ $count =0;
 
 
 $clear = new zane_whattodo();
-$DB->execute("DELETE FROM whattodo");
+
+$query = "DELETE FROM whattodo WHERE list_name = '" . $postListName. "' ";
+$DB->execute($query);
+
+
+
+if ($postList == ""){
+	die("SUCCESS: Cleared out list ". $postListName );
+}
 
 
 foreach ($list_array as $list){
 
 	$newList = new zane_whattodo();
 	
-	$newList->id = $count;
-	$newList->list_name = $list;
+	$newList->list_name = $postListName;
+	$newList->list_contents = $list;
 	
 	$newList->Save();
 	

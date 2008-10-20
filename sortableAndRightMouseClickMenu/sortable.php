@@ -2,7 +2,8 @@
                     "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-	<link rel="stylesheet" type="text/css" href="jquery.contextMenu.css" /> 
+	<link rel="stylesheet" type="text/css" href="jquery-ui-themeroller.css" /> 
+	<link rel="stylesheet" type="text/css" href="jquery.contextMenu.css" />  
    	<script src="jquery-1.2.6.js" type="text/javascript" charset="utf-8"></script>
    	<script src="jquery-ui-1.6rc2.js" type="text/javascript" charset="utf-8"></script>
 	<script type="text/javascript" src="jquery.contextMenu.js"></script>
@@ -22,6 +23,20 @@
 			$obj.remove();
 		}  	
 	}  	
+
+	function setAutocomplete(){
+	
+		$.ajax({
+			type: "POST",
+			data: "type=uniqueList",
+			url: "retrieveSortableList.php",
+			success: function(data){
+				var tdata = data.split(",");
+	    		$("#ListName").autocomplete({data: tdata });
+		    }				  
+		});		
+
+	}
 	
 	function saveMyList(){
     		// collect all li's of the mylist div
@@ -47,8 +62,9 @@
 				
 				var postData = "list=" + list;
 				
-				//alert(postData);
+				postData = postData + "&list_name=" + $("#ListName").val();
 				
+				// alert(postData);
 				
 				// post with the ajax and then set everything to be unchanged
 				$.ajax({
@@ -61,7 +77,10 @@
 				    // set all li's of myList to be class unchanged
 				    $("#myList > li").removeClass().addClass("unchanged");
 				  }				  
-				});				
+				});			
+				
+				
+				setAutocomplete();	
 				
 				                              
             } // end if collection   	
@@ -86,6 +105,7 @@
                 alert (list);       
             }    
 	}
+	
 	
 
 	function rightMouseClickAction(action, el, pos) {
@@ -165,7 +185,39 @@
     	} 	
 	}
 
-	
+	function loadMyList (){
+    	var postData = "list_name=" + $("#ListName").val();
+    	
+		$.ajax({
+			type: "POST",
+			data: postData,
+			url: "retrieveSortableList.php",
+			success: function(loadList){
+				
+				if (loadList != ''){
+				
+				
+					// comma separate list of names that need to be set into LI.
+					var listArray = loadList.split(",");
+					var loadListHTML = '';
+					
+					for(var i=0; i<listArray.length; i++){
+					  loadListHTML = loadListHTML + "<li class=\"unchanged\">" + listArray[i] + "</li>";
+					}				
+					
+					$("#myList").html(loadListHTML);
+				}
+				else {
+					alert('No list found for ' + $("#ListName").val());
+				}
+		    	// have to unbinde the old dblclick and then rebind the new
+		    	
+		    	// have to unbinde the old dblclick and then rebind the new after changing the list
+		    	resetClicks();
+				
+		    }				  
+		});		
+	}
   	
   	
   $(document).ready(function(){
@@ -222,27 +274,8 @@
     });
     
     $("#loadMyList").click(function () {
-		$.ajax({
-			type: "GET",
-			url: "retrieveSortableList.php",
-			success: function(loadList){
-				
-				// comma separate list of names that need to be set into LI.
-				var listArray = loadList.split(",");
-				var loadListHTML = '';
-				
-				for(var i=0; i<listArray.length; i++){
-				  loadListHTML = loadListHTML + "<li class=\"unchanged\">" + listArray[i] + "</li>";
-				}				
-				
-				$("#myList").html(loadListHTML);
-		    	// have to unbinde the old dblclick and then rebind the new
-		    	
-		    	// have to unbinde the old dblclick and then rebind the new after changing the list
-		    	resetClicks();
-				
-		    }				  
-		});	    		
+    
+		loadMyList();    		
     });
     
     $("#saveMyList").click(function () {
@@ -268,6 +301,17 @@
 		 showLists(listType);  	
     });
 
+	// get the unique list of list_names
+	// set them up as an autocomplete	
+	setAutocomplete();
+	
+    $("#newListItem").keypress( function() {
+		if (event.keyCode == 13){addNewList();}
+	});
+
+    $("#ListName").keypress( function() {
+		if (event.keyCode == 13){loadMyList();}
+	});    
     
   });
   </script>
@@ -276,7 +320,7 @@
 <body>
   <style>
   	ul { list-style: none; }
-	li { background: #727EA3; color: #FFF; width: 300px; margin: 5px; font-size: 10px; font-family: Arial; padding: 3px; }
+	li { background: #727EA3; color: #FFF; width: 200px; margin: 5px; font-size: 10px; font-family: Arial; padding: 3px; }
 	
 	.unchanged {background: green;}
 	.changed {background: yellow; color: black;}
@@ -318,17 +362,40 @@
 
 <div id=explain class=explain>
 </div>
+<table>
+	<tr>
+		<td>
+			List Title:
+		</td>
+		<td>
+			<input id=ListName type=text style="width:300 ; width: 300px; margin: 5px; font-size: 10px; font-family: Arial; padding: 3px;"> </input>
+			<input id=loadMyList type=submit value=Load>
+			<input id=saveMyList type=submit value=Save>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Add new List item:
+		</td>
+		<td>
+			<input id=newListItem value=test type=text style="width:300 ; width: 300px; margin: 5px; font-size: 10px; font-family: Arial; padding: 3px;"> </input>
+			<input id=addToMyList type=submit value=Add>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=2>
+			<input id=clearMyList type=submit value="Clear List">
+			<input id=templateMyList type=submit value=" Load Template">
+			<input id=showUnchangedMyLists type=submit value="Show Unchanged">
+			<input id=showAddedMyLists type=submit value="Show Added">
+			<input id=showChangedMyLists type=submit value="Show Changed">			
+		</td>
+
+	</tr>	
+	
+</table> 
 
 
-<input id=newListItem value=test type=text style="width:300 ; width: 300px; margin: 5px; font-size: 10px; font-family: Arial; padding: 3px;"> </input>
-<input id=addToMyList type=submit value=Add>
-<input id=loadMyList type=submit value=Load>
-<input id=saveMyList type=submit value=Save>
-<input id=clearMyList type=submit value="Clear List">
-<input id=templateMyList type=submit value=" Load Template">
-<input id=showUnchangedMyLists type=submit value="Show Unchanged">
-<input id=showAddedMyLists type=submit value="Show Added">
-<input id=showChangedMyLists type=submit value="Show Changed">
   
 <ul id="myList">
 
