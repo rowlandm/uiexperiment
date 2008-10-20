@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+  <html>
+  <head>
+  	<link rel="stylesheet" type="text/css" href="jquery.contextMenu.css" /> 
+  	<style> </style>
+  	
+    <script type="text/javascript" src="jquery-1.2.6.js"></script>
+    <script type="text/javascript" src="jquery.contextMenu.js"></script>
+    
+    <script type="text/javascript">
+      // Your code goes here
+      
+      
+    // NOTES:
+    /*
+    
+    The context menu stuff was found here: http://abeautifulsite.net/notebook/80
+    You have to use .contextmenu in the jquery.contextMenu.css 
+    This also includes stuff for the secondary menu
+    
+     */
+      
+      
+    // SECONDARY MENU code  
+	var obj = null;
+	
+	function checkHover() {
+		if (obj) {
+			obj.find('ul').fadeOut('fast');	
+		} //if
+	} //checkHover      
+    // SECONDARY MENU code  ENDS
+    
+    
+    
+     $(document).ready(function(){
+     
+
+
+     
+				// Show menu when #myDiv is clicked
+				$("#hideDiv").contextMenu({
+					menu: 'myMenu',
+					inSpeed: 150,
+					outSpeed: 150
+					
+				},
+					function(action, el, pos) {
+					  alert(
+						'Action: ' + action + '\n\n' +
+						'Element ID: ' + $(el).attr('id') + '\n\n' + 
+						'X: ' + pos.x + '  Y: ' + pos.y + ' (relative to element)\n\n' + 
+						'X: ' + pos.docX + '  Y: ' + pos.docY+ ' (relative to document)'
+						); 
+						
+		 	
+						
+				});
+				
+				
+				$("#myMenu").show();
+				
+				
+				
+
+				var newHTML = ' <li id=EnableMenu1 class="EnableMenu1"> ';
+        		newHTML = newHTML +	' <a href="#EnableMenu1">Show Zane Smiling</a> ';
+    			newHTML = newHTML +	' </li> ';
+    			newHTML = newHTML + ' <li id=DisableMenu1 class="DisableMenu1"> ';
+        		newHTML = newHTML +	' <a href="#DisableMenu1">Hide Zane Smiling</a> ';
+    			newHTML = newHTML +	' </li> ';
+    			newHTML = newHTML + ' <li id=EnableAll class="EnableAll"> ';
+        		newHTML = newHTML +	' <a href="#EnableAll">Enable All</a> ';
+    			newHTML = newHTML +	' </li> ';
+    			newHTML = newHTML + ' <li id=DisableAll class="DisableAll"> ';
+        		newHTML = newHTML +	' <a href="#DisableAll">Disable All</a> ';
+    			newHTML = newHTML +	' </li> ';
+				
+
+				
+				
+				$("#myMenu").html(  newHTML + $("#myMenu").html());
+
+				
+				$("#myMenu").hide();		
+
+   		
+   		
+   		  	// SECONDARY MENU code  
+			// This is all about the secondary menus
+			
+			
+			// hides all the sub menus of the myMenu
+			$('#myMenu>li>ul').hide();
+			
+			 
+			$('#myMenu > li').hover(function() {
+				if (obj) {
+					obj.find('ul').fadeOut('fast');
+					obj = null;
+				} //if
+				
+				$(this).find('ul').fadeIn('fast');
+			}, function() {
+				obj = $(this);
+				setTimeout(
+					"checkHover()",
+					400);
+			});
+		
+		  	// SECONDARY MENU code ENDS
+		  	
+
+   
+ 	});
+      
+    </script>
+  </head>
+  <body>
+  <h1>Right mouse click on the large pictures </h1>
+<ul id="myMenu" class="contextMenu">
+
+    
+
+    <li class="edit" >
+        	<!--  This is for the secondary menus  -->
+  			<a href="#">Edit Options > </a>
+  			
+  			<!--  this is to push the secondary menu out  -->
+  			<!-- 
+  			<ul class="editMenu" style = "margin-left: 160px;margin-top:-23px">
+  			
+  			 -->
+  			<ul class="editMenu" style = "margin-left: 160px;margin-top:-113px">
+  			
+    		    <li class="cut separator">
+        			<a href="#cut">Cut</a>
+    			</li>
+    			<li class="edit">
+        			<a href="#edit">Edit</a>
+    			</li>
+				<li class=paste>
+					<a href="#paste">Paste</a>
+				</li>
+			    <li class="delete">
+       				<a href="#delete">Delete</a>
+  				</li>
+  				<li class="copy">
+  					<a href="#copy">Copy</a>
+  				</li>
+  				
+			</ul>
+    
+        </li>  
+
+    <li class="quit separator">
+        <a href="#quit">Quit</a>
+    </li>
+</ul>
+
+<!--  RMC menu .css styling -->
+<style>ul { list-style: none; }
+.ui-selected { background: #727EA3; color: #FFF; }
+.ui-selecting { border: 1px solid #AAA; }
+li { background: #CFD4E6; width: 200px; margin: 5px; font-size: 10px; font-family: Arial; padding: 3px; }</style>  
+  
+    
+
+<div id=hideDiv>
+    <div id="header" style="width:100%;  height:600px; display:block;">
+
+    <img id="zaneinthebath" src="zane in the bath.jpg" style="vertical-align:top" > 
+	<img id="zanesmiling" src="zanesmiling.jpg" >
+    
+	</div>
+	
+
+    
+</div>    
+	
+    
+  </body>
+  
+  
+  
+  
+  </html>
