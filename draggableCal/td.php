@@ -59,7 +59,7 @@ li { background: #CFD4E6; width: 100px; margin-top: 5px; font-size: 10px; font-f
 
 <div style='display: table-cell'>
 
-		<table id="timeslotsLbl">
+		<table id="timeslotsLbl" height='100%'>
 		<?php
 		foreach($timeslotArray as $value){
 		?>
@@ -72,7 +72,7 @@ li { background: #CFD4E6; width: 100px; margin-top: 5px; font-size: 10px; font-f
 </div>
 <div style='display: table-cell'>		
 		
-		<table class="ava" id="timeslots0">
+		<table class="ava" id="timeslots0" height='100%'>
 		<?php
 		$nBlocked=0;
 		$timeslotArray = timeslotArray("08:00","13:30","15","24");
@@ -98,23 +98,32 @@ li { background: #CFD4E6; width: 100px; margin-top: 5px; font-size: 10px; font-f
 
 <script>
 function merge(tableName,className){
+	var spanedHeight = 0;
+	var spanedMargin = 0;
+	var toBeDel = [];
 	var idFirst="";
 	var count = 0;
 	var o = document.getElementById(tableName).getElementsByTagName("td");
+	
 	for(var i=0;i<o.length;i++){
+    	//alert(o[i].id+': '+o[i].className);
 	    if(o[i].className == "ui-selectee "+className){
 			if(idFirst==""){
 				idFirst = o[i];
+				spanedHeight = spanedHeight + o[i].offsetHeight;
 			}else{
-				document.getElementById('tr'+o[i].id).deleteCell(o[i].cellIndex);
-				//alert(o[i].cellIndex);
+				toBeDel[toBeDel.length] = o[i].id;
+				spanedHeight = spanedHeight + o[i].offsetHeight;
 			}
 	        count ++;
 		}
 	}
-	idFirst.rowSpan=count;
-	idFirst.style.height="400px";
-	//alert(idFirst.rowSpan);
+
+	for(var i=0;i<toBeDel.length;i++){
+		document.getElementById('tr'+toBeDel[i]).deleteCell(document.getElementById(toBeDel[i]).cellIndex);
+	}
+	spanedHeight = spanedHeight + spanedMargin;
+	idFirst.height=spanedHeight+'px';
 }
 </script>
 		
