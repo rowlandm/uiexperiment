@@ -17,7 +17,12 @@ foreach($timeslotArray as $key => $value){
 ?>
   <script>
   $(document).ready(function(){
-    $("#timeslots<?php echo $blkCount;?>").selectable();
+	
+    $("#timeslots<?php echo $blkCount;?>").selectable({
+    		stop: function(e, ui) {
+    		merge('timeslots<?php echo $blkCount;?>','ui-selected')
+		}
+	});
   });
   </script>
 <?php
@@ -27,13 +32,14 @@ $blkCount++;
 if($blkCount==0){
 ?>
   <script>
-	$(document).ready(function(){          
-       	$('td').selectable({                   	
-        	stop: function(e,ui){
-				alert('edfefe');
-            }
-       	};        
-	};
+  $(document).ready(function(){
+		
+	    $("#timeslots0").selectable({
+	    		stop: function(e, ui) {
+	    		merge('timeslots0','ui-selected')
+			}
+		});
+	  });
   </script>
 <?php
 }
@@ -41,10 +47,10 @@ if($blkCount==0){
   
 
 <style>
-.blk {background: black; width: 100px;  font-size: 10px; font-family: Arial;color:white;margin-left:1px;padding:1px }
+.blk {background: black; width: 100px;  font-size: 12px; font-family: Arial;color:white;margin-left:1px;padding:1px }
 .ui-selected { background: #CFD499; color: black;}
 .ui-selecting { background: #727EA3;}
-td {background: #CFD4E6; width: 100px;  font-size: 10px; font-family: Arial;}
+td {background: #CFD4E6; width: 100px;  font-size: 12px; font-family: Arial;}
 </style>
 
 </head>
@@ -119,18 +125,17 @@ function merge(tableName,className){
 	spanedHeight = spanedHeight+count-1;
 	idFirst.height=spanedHeight+'px';
 	idFirst.style.padding='0px';
+	idFirst.innerHTML="";
 	
-	new_element = document.createElement("textarea");
-	new_element.setAttribute("type", "text");
-	new_element.setAttribute("name", "element_name");
-	new_element.setAttribute("id", "element_id");
-	new_element.setAttribute("value", "element_value");
-	new_element.setAttribute("style", "width:90%");
-	idFirst.appendChild(new_element); 
+	comment = document.createElement("textarea");
+	comment.setAttribute("type", "text");
+	comment.setAttribute("name", "comment");
+	comment.setAttribute("id", "comment");
+	comment.setAttribute("style", "width:90%;height:80%;");
+	idFirst.appendChild(comment); 
 	
 }
 </script>
 		
-<input type="button" onclick="merge('timeslots0','ui-selected')">
 </body>
 </html>
