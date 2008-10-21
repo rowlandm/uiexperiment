@@ -10,8 +10,55 @@ require_once('time.lib.php');
 <head>
   	<script src="jquery-1.2.6.js"></script>
 	<script src="jquery-ui-personalized-1.6rc2.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="jquery.contextMenu.css" /> 
+  	<script type="text/javascript" src="jquery.contextMenu.js"></script>
   	<script>
   	
+  	function calculateDailyTotals (dayChosen){
+		
+		
+		var collection = jQuery("div[id*='" + dayChosen +  "']");
+		
+		var totals  = new Array();
+		
+						
+		collection.each(function(){
+		
+			
+			var divValues = $(this).text().split(";");
+			
+			var key = divValues[0];
+			var value = divValues[3];
+			
+			// name  and time in hours
+			// alert(divValues[0] + ' ; ' + divValues[3]);
+			if (totals[key] == undefined){
+				totals[key] = 0;
+				//alert (key + '::' + totals[key]);
+			} 	
+			
+			
+			
+			totals[key] = totals[key] + parseFloat(value);
+						
+			
+		});
+		
+		$("#showTotals").remove();
+		var newDivTotals = '<div id="showTotals" style="background:black; color:white" >';
+		
+		for (key in totals){
+			newDivTotals = newDivTotals + key + ":" + totals[key] + "<br>";
+		}		
+		
+		newDivTotals = newDivTotals + "</div>";
+		
+		$("#overCalendar").append(newDivTotals);  	
+	}
+	
+	
+	
+  	// this function is to be able to double click on the div and then delete it and remove selections
   	function doubleClickSaved (name,count,start,end,parent){
   	
   		var delSaved = confirm("Do you wish to delete?");
@@ -22,21 +69,34 @@ require_once('time.lib.php');
   			// for any child of the parent
   			// eg. #timeslotsTuesday > li.07:15
   			
+  			// couldn't use li.07:15 as a class, so changed the : to a -
+  			// eg. li.07-15 as the class for a selection that started at 07:15
   			var txtStart = start.replace(/:/,"-");
   			
+  			
+  			// this is the jquery query we will be using
+  			// eg. #timeslotsMonday > li.07-15
+  			// the #timeslotsMonday is the object (in this case a ul) with the id of timeslotsMonday
+  			// the > denotes all children of that object 
+  			// the li.07-15 is all li children of timeslotsMonday that has a class of 07-15
+  			// since 
   			var query = "#" + parent + " > li."+txtStart;
   			 
-  			
+  			// run the actual query
   			var deleteCollection = jQuery(query);
   			
   			
-  			
+  			// if it returns something
   			if(deleteCollection) {
+  			
+  			
+  				// do the for each of the list returned
             	deleteCollection.each(function() {
                 	
 	                // now reset this back to what it used to be
-    	            
-        	        $(this).removeClass('saved').removeClass(txtStart).css("background","").css("color","").css("border-bottom","").css("height","").unbind("click");
+    	            // removing classes that were used when saving the block
+    	            // remove the .css by setting the attribute to blank
+        	        $(this).removeClass('saved').removeClass(txtStart).css("background","").css("color","").css("border-bottom","").css("height","");
         	        
 	
         	        
@@ -47,6 +107,8 @@ require_once('time.lib.php');
   			
   			
   			// delete the appropriate div
+  			// note the div id is the parent + the start 
+  			// eg. id=timeslotsMonday07-15 
   			$("#" + parent + txtStart).remove();
 			  			
   			
@@ -58,18 +120,25 @@ require_once('time.lib.php');
   	
   	$(document).ready(function(){
 
-
+		
         var collection;
           
+          
+          
+        // This is to set all ul tags that are in the overCalendar DIV to be selectable - includes li tags too
        	$('ul').selectable({
        	
+       		// this is what to do when you are selecting
+       		// want to stop li's with class of saved from being selected
+       		// as they have already been selected.
        		selecting: function(ev, ui) {
 
                if ($(ui.selecting).hasClass("saved")){
-               		// can we stop it from being selected?               	
+               		// can we stop it from being selected?     
+               		// class is added ui-selecting when you are selecting li's          	
                		$(ui.selecting).removeClass('ui-selecting');
 
-               		//alert( $(ui.selecting).attr('class'));
+               		
                
                }
                 
@@ -77,9 +146,15 @@ require_once('time.lib.php');
             },
        	
 
-                   	
+            // this sets a permanent saved class to each element selected
+            // if the name is set 
+            // it also creates a div to overlay the elements selected.
         	stop: function(e,ui){
 				                               	
+				// once the selection has stopped, it will chnage elements
+				// from class ui-selecting to ui-selected
+				// the :visible is to get all the li's that have a class
+				// of ui-selected that are visible
                 collection = jQuery('li.ui-selected:visible');
                     
 				
@@ -87,11 +162,23 @@ require_once('time.lib.php');
 				
 				if(collection) {
                 	
+                	
+                	
+                	// can find out the start and end times
+                	// and also the number of elemetns selected
                 	var count = collection.size();
                 	var start = collection.eq(0).text();
                 	var end = collection.eq(count - 1).text();
                     
                     
+                    
+                    // want to check that the start and end dates
+                    // have all elements selected between them
+                    // eg. from 9:00 to 9:45 there are 4 elements
+                    // 9:00, 9:15, 9:30 and 9:45
+                    // if the count says there are only 3 elements
+                    // it means thatone of those elements is
+                    // already saved and the selection is invalid
                     var startDate = new Date();
                     var endDate = new Date();
                     
@@ -117,8 +204,8 @@ require_once('time.lib.php');
                     
                     // check that there the difference between the start and end times match up to the number of counts we expect
                     if (expectantCount != count){
-						alert ("invalid selection");
-						// reset all the selections
+						alert ("Invalid selection.");
+						// reset all the selections if invalid selection
     	                collection.each(function() {
         	            	//set the new height based on the height of the li height:20px  and bottom of 2px
             	        	$(this).removeClass('ui-selected');
@@ -132,6 +219,8 @@ require_once('time.lib.php');
 						
 							var name = prompt("Please enter in the name of the appointment from " + start + " to " + end, "");
 								
+							// going to add the start to the class, and it has problems
+							// seeing : when in the class, so changing it to -
 							var txtStart = start.replace(/:/,"-");
 														
 							if (name != null && name != ""){  							
@@ -141,40 +230,100 @@ require_once('time.lib.php');
 		                    	
 		                    		
 		                    	
-									//set the new height based on the height of the li height:20px  and bottom of 2px
-		            	        	$(this).removeClass('ui-selected').addClass(txtStart).addClass("saved");
-		           					$(this).unbind("click").css("background","red").css("color","white").css("border-bottom","0px").css("height","12px");
-		           					    		
+									//set the new height based on the height of the li height:10px  and bottom of 2px
+									// also set the colors and background to be different, even though it is technically irrelevant
+									// as the div will be placed over it
+		            	        	$(this).removeClass('ui-selected').addClass(txtStart).addClass("saved")
+		            	        	.unbind("click").css("background","red").css("color","white").css("border-bottom","0px").css("height","12px");
+		           					
+			    							           					    		
 		                	    });
 		                    
 
+		                    	// this is to get the collection's parent and find it's id
+		                    	// eg. timeslotsMonday
 		                    	var parent = collection.parent().attr('id');
 		                    	
+		                    	
+		                    	// get the position of the first element so we can stick the div directly on top of it
 		                    	var offset = collection.eq(0).offset();
-		                    	var newHeight = (count * 15) - 2;
+		                    	var newHeight = (count * 15) - 2; // the 15 is for the height of each li and the -2 is to take into account the 2px bottom line
 		                    	var newDivSave = '<div id="' + parent + txtStart + '" class = "savedDiv" >';
+		                    	
+		                    	if (count == 1){
+		                    		newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle ><img height=10px src="images/zaneinthebaththumb.png"></div>';
+		                    	}
+		                    	else {
+		                    		newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle ><img height=10px src="images/zaneinthebaththumb.png"></div>';
+		                    	} 
+		                    	// the ; is important as it is used as a delimiter to calculate stuff later on
 		                    	newDivSave = newDivSave + name + ';' + start + ';' + end + ';' + count * 0.25 + '</div>';	
 		                    	
 		                    	
 		                    	
-		                    		                    	
+		                    	// append the new div	                    	
 			                    $("#overCalendar").append(newDivSave);
 			                    
 			                    
+			                    // set the div id to be the name of the parent and the start time
+			                    // eg. timeslotsMonday07-15
 			                    
-			                    $("#" + parent + txtStart).show().css("top",offset.top).css("left",offset.left).addClass(txtStart);	            	
-							    $("#" + parent + txtStart).css("height",newHeight + "px").css("border-bottom","2px solid black").draggable();
+			                    $("#" + parent + txtStart).show().css("top",offset.top).css("left",offset.left).addClass(txtStart)	            	
+							    .css("height",newHeight + "px").css("border-bottom","2px solid black")
 							    
+							    // make the overlying div draggable with a handle that helps make the move accurate
+							    // set the grid - 102 is the width of each column and 15 is the size of each li 
+							    .draggable({
 							    
-							    $("#" + parent + txtStart).dblclick(function () { 
+							    	handle:	"#handle",
+							    	grid: [102,15]
+							    
+							    })
+							    // set to delete if double clicked
+			    				.dblclick(function () { 
 	      	 							doubleClickSaved(name,count,start,end,parent)
-	      	 							});
+	      	 							})
+	      	 					// show menu when Right Mouse Clicked
+								.contextMenu({
+									menu: 'savedDivMenu',
+									inSpeed: 150,
+									outSpeed: 150
+									
+								},
+								function(action, el, pos) {
+									 /* alert(
+										'Action: ' + action + '\n\n' +
+										'Element ID: ' + $(el).attr('id') + '\n\n' + 
+										'X: ' + pos.x + '  Y: ' + pos.y + ' (relative to element)\n\n' + 
+										'X: ' + pos.docX + '  Y: ' + pos.docY+ ' (relative to document)'
+										); 
+										*/
+										
+									if (action == "dailyTotals"){
+										
+										
+										var actionDayChosen = el.attr('id').slice(9,-5);
+										// var actionDayChosen = "Tuesday";
+										 
+										// alert(actionDayChosen);
+										calculateDailyTotals(actionDayChosen);
+																	
+									}		
+									if (action == "showDetails"){
+										alert("test");								
+									}	
+									if (action == "delete"){
+										alert("Please double click the green area to delete");
+									}	
+										
+								});
 							                	
 							} // end of if name != ""	
 							else {
+								// if no name then 
 								// reset all the selections
     			                collection.each(function() {
-        	    	    	    	//set the new height based on the height of the li height:20px  and bottom of 2px
+        	    	    	    	
             	    	    		$(this).removeClass('ui-selected');
            					
                 	    		});						
@@ -191,23 +340,33 @@ require_once('time.lib.php');
             }				
 
          });    	
+
+
+		$("#savedDivMenu").hide();
+		
+
          
+         
+        // this is to allow the draggable to drop into something 
 		$("li").droppable({ 
+		
+			// only accept savedDiv class objects
 		    accept: ".savedDiv", 
+		    tolerance:		'pointer', // this along with the handle option in draggable is to reduce the area that the user can drop to improve accuracy 
 		    drop: function(ev, ui) { 
 		        $(this).append("Dropped! "); 
 		        
 		        
 		        //  find the position of the current droppable object on that day eg. 11
 		        
-		        // get the count of the draggable object eg. 4 ( or one hour) and then divide it by 2 and round up
+		        // get the count of the draggable object eg. 4 ( or one hour) and then divide it by 2 and round down
 		        // these are the number of li's above the current li that need to be selected
 		        
 		        // go through the collection of these li's - if any are of class saved then error out
 		        
 		        // now go through and add a new div and change the li's as if it was selected
 		        
-		        
+		     
 		        
 		        
 		        
@@ -215,47 +374,15 @@ require_once('time.lib.php');
 		    }  
 		});         
 		
+		
+		// this is to calculate the subtotals for the day
+		// based on the name entered and the # selected
 		$("#calculate").click(function () {
-			var dayChosen = $("#daySelect").val();
+		
 			
-			var collection = jQuery("div[id*='" + dayChosen +  "']");
+			//var dayChosen = $("#daySelect").val();
 			
-			var totals  = new Array();
-			
-							
-			collection.each(function(){
-			
-				
-				var divValues = $(this).text().split(";");
-				
-				var key = divValues[0];
-				var value = divValues[3];
-				
-				// name  and time in hours
-				// alert(divValues[0] + ' ; ' + divValues[3]);
-				if (totals[key] == undefined){
-					totals[key] = 0;
-					//alert (key + '::' + totals[key]);
-				} 	
-				
-				
-				
-				totals[key] = totals[key] + parseFloat(value);
-							
-				
-			});
-			
-			
-			var newDivTotals = '<div id="showTotals" style="background:black; color:white" >';
-			
-			for (key in totals){
-				newDivTotals = newDivTotals + key + ":" + totals[key] + "<br>";
-			}		
-			
-			newDivTotals = newDivTotals + "</div>";
-			
-			$("#overCalendar").append(newDivTotals);
-			
+			calculateDailyTotals ($("#daySelect").val());
 			
 		});
 		
@@ -297,7 +424,7 @@ if(strpos($user_agent, 'MSIE') !== false)
 	<ul id="timeslotsMonday">
 	<?php
 	
-	$start = "07:00";
+	$start = "05:45";
 	$end = "17:30";
 	$slots = "15";
 	$format = "24";
@@ -450,6 +577,23 @@ if(strpos($user_agent, 'MSIE') !== false)
 	<option value=Saturday>Saturday</option>
 </select>
 <input type=submit id=calculate value=calculate>
+
+
+
+<ul id="savedDivMenu" class="contextMenu">
+    <li class="showDetails">
+        <a href="#showDetails">Show Details</a>
+    </li>
+    <li class="dailyTotals">
+        <a href="#dailyTotals">Daily Totals</a>
+    </li>    
+    <li class="delete">
+        <a href="#delete">Delete</a>
+    </li>
+    <li class="quit separator">
+        <a href="#quit">Quit</a>
+    </li>
+</ul>
 
 </body>
 </html>
