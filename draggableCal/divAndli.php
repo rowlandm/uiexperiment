@@ -41,27 +41,6 @@ require_once('time.lib.php');
 	
         	        
                 });		
-/*                  				
-                if (count > 2){
-                    deleteCollection.eq(0).text(start);	
-                    deleteCollection.eq(1).text(secondTime);
-                    deleteCollection.eq(count - 1).text(end);
-                }
-		                    	
-                if (count == 1) {	
-                
-                 	deleteCollection.eq(0).text(start);	
-                }
-                
-				if (count == 2) {	
-                   	deleteCollection.eq(0).text(start);
-                   	deleteCollection.eq(1).text(end);
-                    		
-                }	
-                
-                */
-                
-                
                 
                 
   			}
@@ -171,26 +150,7 @@ require_once('time.lib.php');
 		           					    		
 		                	    });
 		                    
-		                    	// set the name of the person at the top
-		                    /*
-		                    	if (count > 2){
-		                    		collection.eq(0).text(name).css("color","black");	
-		                    		collection.eq(1).text(start + " to " + end).css("color","black");
-		                    		collection.eq(count - 1).css("border-bottom","2px solid black").css("height","10px");		                    			
-		                    	}
-		                    	
-		                    	
-		                    	if (count == 1) {	
-		                    	
-		                    		collection.eq(0).text(name + " " + start).css("color","black");	
-		                    	}
-								if (count == 2) {	
-		                    		collection.eq(0).text(name + " " + start).css("color","black");;
-		                    		collection.eq(1).css("border-bottom","2px solid black").css("height","10px");
-		                    			
-		                    	}		        
-		                    	*/
-		                    	
+
 		                    	var parent = collection.parent().attr('id');
 		                    	
 		                    	var offset = collection.eq(0).offset();
