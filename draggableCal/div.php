@@ -10,6 +10,7 @@ require_once('time.lib.php');
 <head>
   	<script src="jquery-1.2.6.js"></script>
 	<script src="jquery-ui-personalized-1.6rc2.min.js"></script>
+	<script src="jquery.simplemodal.js"></script>
   	<script>
   	
   	function doubleClickSaved (name,count,start,secondTime,end,parent){
@@ -24,10 +25,8 @@ require_once('time.lib.php');
   			
   			var txtStart = start.replace(/:/,"-");
   			
-  			var query = "#" + parent + " > li."+txtStart;
+  			var query = "#" + parent + " > div."+txtStart;
   			 
-  			 
-  			
   			
   			var deleteCollection = jQuery(query);
   			
@@ -38,25 +37,26 @@ require_once('time.lib.php');
                 	
 	                // now reset this back to what it used to be
     	            
-        	        $(this).removeClass('saved').removeClass(txtStart);
+        	        $(this).removeClass('saved').removeClass(txtStart).css("background","").css("color","").css("border-bottom","").css("height","").unbind("click");
         	        
-           			
+	
+        	        
                 });		
                   				
                 if (count > 2){
-                    deleteCollection.eq(0).text(start).removeClass('firstSaved');	
-                    deleteCollection.eq(1).text(secondTime).removeClass('saved').removeClass('firstSaved');
-                    deleteCollection.eq(count - 1).text(end).removeClass('lastSaved');
+                    deleteCollection.eq(0).text(start);	
+                    deleteCollection.eq(1).text(secondTime);
+                    deleteCollection.eq(count - 1).text(end);
                 }
 		                    	
                 if (count == 1) {	
                 
-                 	deleteCollection.eq(0).text(start).removeClass('onlySaved');	
+                 	deleteCollection.eq(0).text(start);	
                 }
                 
 				if (count == 2) {	
-                   	deleteCollection.eq(0).text(start).removeClass('saved').removeClass('firstSaved');
-                   	deleteCollection.eq(1).text(end).removeClass('saved').removeClass('lastSaved');
+                   	deleteCollection.eq(0).text(start);
+                   	deleteCollection.eq(1).text(end);
                     		
                 }	
                 
@@ -70,24 +70,28 @@ require_once('time.lib.php');
   		} //if delsaved = y
   	}
   	
-  	
+
   	
   	$(document).ready(function(){
 
+		$("#hoverpopup").hide();
+		
+		
+
         var collection;
           
-       	$('.ui-selectee').selectable({
+       	$('#timeslotsMonday').selectable({
        	
        		selecting: function(ev, ui) {
 
                if ($(ui.selecting).hasClass("saved")){
-               	
-               		// can we stop it from being selected?
-               		$(ui.selecting).removeClass().addClass("saved");
+               		// can we stop it from being selected?               	
+               		$(ui.selecting).removeClass('ui-selecting');
+
+               		//alert( $(ui.selecting).attr('class'));
                
                }
                 
-               $(ui.selecting).text("selected");
 
             },
        	
@@ -155,6 +159,7 @@ require_once('time.lib.php');
 							var name = prompt(" please enter in the name of the appointment from " + start + " to " + end, "");
 								
 							var txtStart = start.replace(/:/,"-");
+							
 														
 							if (name != null && name != ""){  							
 								// now clear out the ui-selected class from the selected panels
@@ -165,27 +170,47 @@ require_once('time.lib.php');
 		                    	
 									//set the new height based on the height of the li height:20px  and bottom of 2px
 		            	        	$(this).removeClass('ui-selected').addClass(txtStart).addClass("saved");
-		           					$(this).unbind("click").click(function () { 
+		           					$(this).unbind("click").css("background","green").css("color","green").css("border-bottom","0px").css("height","12px").click(function () { 
 	      	 							doubleClickSaved(name,count,start,secondTime,end,$(this).parent().attr('id'));
-			    					});    		
+			    					});
+			    					
+			    					$(this).hover(
+			    						function () {
+			    						
+			    							
+			    							$("#textPopup").text(name+ "::" + count + ":::" + start + ":::" + secondTime + ":::" + end + ":::" + $(this).parent().attr('id'));
+			    							
+											var offset = $(this).offset();
+											
+											var topOffset = offset.top + 18; 
+											var leftOffset = offset.left + 18;
+											
+											$("#hoverpopup").show().css("top",topOffset).css("left",leftOffset);			    							
+
+											
+	      	 							},
+	      	 							function(){
+	      	 								$("#hoverpopup").hide();
+			    						}
+			    					);    		    		
 		                	    });
 		                    
 		                    	// set the name of the person at the top
 		                    
 		                    	if (count > 2){
-		                    		collection.eq(0).text(name).removeClass('saved').addClass('firstSaved');	
-		                    		collection.eq(1).text(start + " to " + end).removeClass('saved').addClass('firstSaved');
-		                    		collection.eq(count - 1).addClass('lastSaved').removeClass('saved');		                    			
+		                    		collection.eq(0).text(name).css("color","black");	
+		                    		collection.eq(1).text(start + " to " + end).css("color","black");
+		                    		collection.eq(count - 1).css("border-bottom","2px solid black").css("height","10px");		                    			
 		                    	}
 		                    	
 		                    	
 		                    	if (count == 1) {	
 		                    	
-		                    		collection.eq(0).text(name + " " + start).removeClass('saved').addClass('onlySaved');	
+		                    		collection.eq(0).text(name + " " + start).css("color","black");	
 		                    	}
 								if (count == 2) {	
-		                    		collection.eq(0).text(name + " " + start).removeClass('saved').addClass('firstSaved');
-		                    		collection.eq(1).removeClass('saved').addClass('lastSaved');
+		                    		collection.eq(0).text(name + " " + start).css("color","black");;
+		                    		collection.eq(1).css("border-bottom","2px solid black").css("height","10px");
 		                    			
 		                    	}		                    	
 							                	
@@ -214,16 +239,20 @@ require_once('time.lib.php');
   	</script>
 
 
+
 <style>
-ul { list-style: none; margin:0px; padding:0px;}
+div { list-style: none; margin:0px; padding:0px;}
 .ui-selected { background: #black; color: #FFF; border-bottom: 2px solid #727EA3;}
 .ui-selecting { background: #CFD499; } 
 
+.dialog {background: red ; color: white;}
 
-.firstSaved {background: green ; color: black; border-bottom: 0px; height: 12px;}
-.saved {background: green ; color: green; border-bottom: 0px; height: 12px;}
-.lastSaved {color: green; background: green ;border-bottom: 2px solid black; height: 10px;}
-.onlySaved {background: green ; color: black; border-bottom: 2px solid black; height: 10px;}
+.hovering { background: yellow; } 
+
+.firstSaved {background: green ; color: black; border-bottom: 0px; height: 12px;font-size: 9px;}
+.saved {background: green ; color: green; border-bottom: 0px; height: 12px;font-size: 9px;}
+.lastSaved {color: green; background: green ;border-bottom: 2px solid black; height: 10px;font-size: 9px;}
+.onlySaved {background: green ; color: black; border-bottom: 2px solid black; height: 10px;font-size: 9px;}
 
 .ui-selectee {border-bottom: 2px solid black;background: #CFD4E6; height:10px; width: 100px; margin-top:0px; font-size: 9px; font-family: Arial; padding-top: 3px; }
 <?php
@@ -233,12 +262,17 @@ if(strpos($user_agent, 'MSIE') !== false)
 {
 	echo "li {margin-top:-1px;}";
 }
+
 ?>
+
+
+
 </style>
 
 
 </head>
 <body>
+
 
 
 <table CELLSPACING=0>
@@ -273,11 +307,18 @@ if(strpos($user_agent, 'MSIE') !== false)
 		}
 	}
 	?>
-	</ul>
+	</div>
 	</td>
-
+	
 				
 	</tr>
 </table>
+
+
+<div id="hoverpopup" style=" position:absolute; top:55; left:44;">
+<table bgcolor="#0000FF">
+<tr><td id=titlePopup color="#FFFFFF">Details</td></tr>
+<tr><td id=textPopup bgcolor="#8888FF">Hello I am a popup table</td></tr></table></div>
+
 </body>
 </html>
