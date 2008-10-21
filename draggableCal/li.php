@@ -36,25 +36,26 @@ require_once('time.lib.php');
                 	
 	                // now reset this back to what it used to be
     	            
-        	        $(this).removeClass('saved').removeClass(txtStart);
+        	        $(this).removeClass('saved').removeClass(txtStart).css("background","").css("color","").css("border-bottom","").css("height","").unbind("click");
         	        
-           			
+	
+        	        
                 });		
                   				
                 if (count > 2){
-                    deleteCollection.eq(0).text(start).removeClass('firstSaved');	
-                    deleteCollection.eq(1).text(secondTime).removeClass('saved').removeClass('firstSaved');
-                    deleteCollection.eq(count - 1).text(end).removeClass('lastSaved');
+                    deleteCollection.eq(0).text(start);	
+                    deleteCollection.eq(1).text(secondTime);
+                    deleteCollection.eq(count - 1).text(end);
                 }
 		                    	
                 if (count == 1) {	
                 
-                 	deleteCollection.eq(0).text(start).removeClass('onlySaved');	
+                 	deleteCollection.eq(0).text(start);	
                 }
                 
 				if (count == 2) {	
-                   	deleteCollection.eq(0).text(start).removeClass('saved').removeClass('firstSaved');
-                   	deleteCollection.eq(1).text(end).removeClass('saved').removeClass('lastSaved');
+                   	deleteCollection.eq(0).text(start);
+                   	deleteCollection.eq(1).text(end);
                     		
                 }	
                 
@@ -80,9 +81,10 @@ require_once('time.lib.php');
        		selecting: function(ev, ui) {
 
                if ($(ui.selecting).hasClass("saved")){
-               	
-               		// can we stop it from being selected?
-               		$(ui.selecting).removeClass().addClass("saved");
+               		// can we stop it from being selected?               	
+               		$(ui.selecting).removeClass('ui-selecting');
+
+               		//alert( $(ui.selecting).attr('class'));
                
                }
                 
@@ -163,7 +165,7 @@ require_once('time.lib.php');
 		                    	
 									//set the new height based on the height of the li height:20px  and bottom of 2px
 		            	        	$(this).removeClass('ui-selected').addClass(txtStart).addClass("saved");
-		           					$(this).unbind("click").click(function () { 
+		           					$(this).unbind("click").css("background","green").css("color","green").css("border-bottom","0px").css("height","12px").click(function () { 
 	      	 							doubleClickSaved(name,count,start,secondTime,end,$(this).parent().attr('id'));
 			    					});    		
 		                	    });
@@ -171,19 +173,19 @@ require_once('time.lib.php');
 		                    	// set the name of the person at the top
 		                    
 		                    	if (count > 2){
-		                    		collection.eq(0).text(name).removeClass('saved').addClass('firstSaved');	
-		                    		collection.eq(1).text(start + " to " + end).removeClass('saved').addClass('firstSaved');
-		                    		collection.eq(count - 1).addClass('lastSaved').removeClass('saved');		                    			
+		                    		collection.eq(0).text(name).css("color","black");	
+		                    		collection.eq(1).text(start + " to " + end).css("color","black");
+		                    		collection.eq(count - 1).css("border-bottom","2px solid black").css("height","10px");		                    			
 		                    	}
 		                    	
 		                    	
 		                    	if (count == 1) {	
 		                    	
-		                    		collection.eq(0).text(name + " " + start).removeClass('saved').addClass('onlySaved');	
+		                    		collection.eq(0).text(name + " " + start).css("color","black");	
 		                    	}
 								if (count == 2) {	
-		                    		collection.eq(0).text(name + " " + start).removeClass('saved').addClass('firstSaved');
-		                    		collection.eq(1).removeClass('saved').addClass('lastSaved');
+		                    		collection.eq(0).text(name + " " + start).css("color","black");;
+		                    		collection.eq(1).css("border-bottom","2px solid black").css("height","10px");
 		                    			
 		                    	}		                    	
 							                	
@@ -218,10 +220,7 @@ ul { list-style: none; margin:0px; padding:0px;}
 .ui-selecting { background: #CFD499; } 
 
 
-.firstSaved {background: green ; color: black; border-bottom: 0px; height: 12px;}
-.saved {background: green ; color: green; border-bottom: 0px; height: 12px;}
-.lastSaved {color: green; background: green ;border-bottom: 2px solid black; height: 10px;}
-.onlySaved {background: green ; color: black; border-bottom: 2px solid black; height: 10px;}
+
 
 li {border-bottom: 2px solid black;background: #CFD4E6; height:10px; width: 100px; margin-top:0px; font-size: 9px; font-family: Arial; padding-top: 3px; }
 <?php
