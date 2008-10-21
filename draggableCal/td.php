@@ -27,9 +27,13 @@ $blkCount++;
 if($blkCount==0){
 ?>
   <script>
-  $(document).ready(function(){
-    $("#timeslots0").selectable();
-  });
+	$(document).ready(function(){          
+       	$('td').selectable({                   	
+        	stop: function(e,ui){
+				alert('edfefe');
+            }
+       	};        
+	};
   </script>
 <?php
 }
@@ -116,12 +120,13 @@ function merge(tableName,className){
 	idFirst.height=spanedHeight+'px';
 	idFirst.style.padding='0px';
 	
-	new_element = document.createElement("input");
+	new_element = document.createElement("textarea");
 	new_element.setAttribute("type", "text");
 	new_element.setAttribute("name", "element_name");
 	new_element.setAttribute("id", "element_id");
 	new_element.setAttribute("value", "element_value");
-	//document.forms['form_name'].appendChild(new_element); 
+	new_element.setAttribute("style", "width:90%");
+	idFirst.appendChild(new_element); 
 	
 }
 </script>
