@@ -14,8 +14,13 @@ require_once('time.lib.php');
   	<script type="text/javascript" src="jquery.contextMenu.js"></script>
   	<script>
   	
-  	function setSelectedElementsToSave (collection,name,start,end,count){
+  	function setSelectedElementsToSave (collection,name){
   		
+  		
+		var count = collection.size();
+		var start = collection.eq(0).text();
+		var end = collection.eq(count - 1).text();
+  
   		var txtStart = start.replace(/:/,"-");
   	
 		// now clear out the ui-selected class from the selected panels
@@ -80,7 +85,13 @@ require_once('time.lib.php');
 		})
 		// set to delete if double clicked
 		.dblclick(function () { 
-			deleteSavedDiv($(this));
+		
+		  	var delSaved = confirm("Do you wish to delete?");
+  		
+  		
+  			if (delSaved){
+				deleteSavedDiv($(this));
+			}
 		})
 		// show menu when Right Mouse Clicked
 		.contextMenu({
@@ -136,8 +147,14 @@ require_once('time.lib.php');
 			}	
 			
 			if (action == "delete"){
-				deleteSavedDiv(el);
-			}	
+			
+			  	var delSaved = confirm("Do you wish to delete?");
+	  		
+	  		
+	  			if (delSaved){			
+					deleteSavedDiv(el);
+				}	
+			}
 							
 		});
   	
@@ -226,10 +243,6 @@ require_once('time.lib.php');
 
   		
   		
-  		var delSaved = confirm("Do you wish to delete?");
-  		
-  		
-  		if (delSaved){
   		
 	  		// find the data hidden in the span of the element el
   			var spanName = el.attr('id') + 'data';  		
@@ -291,7 +304,7 @@ require_once('time.lib.php');
 			  			
   			
   			
-  		} //if delsaved = y
+  		
   	}
   	
   	
@@ -342,16 +355,13 @@ require_once('time.lib.php');
 				
 				if(collection) {
                 	
-                	
-                	
                 	// can find out the start and end times
                 	// and also the number of elemetns selected
                 	var count = collection.size();
                 	var start = collection.eq(0).text();
                 	var end = collection.eq(count - 1).text();
-                    
-                    
-                    
+                	
+                	
                     // want to check that the start and end dates
                     // have all elements selected between them
                     // eg. from 9:00 to 9:45 there are 4 elements
@@ -404,7 +414,7 @@ require_once('time.lib.php');
 														
 							if (name != null && name != ""){  							
 								
-								setSelectedElementsToSave (collection,name,start,end,count);								
+								setSelectedElementsToSave (collection,name);								
 								
 							                	
 							} // end of if name != ""	
@@ -444,35 +454,30 @@ require_once('time.lib.php');
 		    tolerance:		'pointer', // this along with the handle option in draggable is to reduce the area that the user can drop to improve accuracy 
 		    drop: function(ev, ui) { 
 		        
-
-		        
-		        
-		        
-		        
 			    // find the data hidden in the span of the element el
 	  			var spanName = ui.draggable.attr('id') + 'data';  		
-	  		
-	  		 	
-	  		 	
 	  		 	
 				// get an array of the data that is hidden in the span
 				var spanValues = $('#' + spanName).text().split(';');
-		        var divLength = spanValues[4];		        
+		        var divLength = spanValues[4];	
+		        var parent = spanValues[5];
+		        var start = spanValues[1];	  
+		        var oldName = spanValues[0];      
 		        
-		        
+		        $("#divLength").remove();
 		        $("#overCalendar").append("<div id=divLength>" + divLength + "</div>");
 		        $("#divLength").hide();
 		        
 		        if ($(this).hasClass('saved')){
 		        	alert ('Invalid Move');
-		        	
+		        	$("#divLength").remove();
 		        }
 		        else {
 		        	
 		        	//set the class so we can find it later
 		        	$(this).addClass('moved');
 		        	
-		        	$("#overCalendar").append($(this).parent().attr('id') + ' ' + $(this).text() + '<br>');
+		        	// $("#overCalendar").append($(this).parent().attr('id') + ' ' + $(this).text() + '<br>');
 			        
 		        
 			        // get all the rest of the siblings to check if they can be moved 
@@ -481,7 +486,7 @@ require_once('time.lib.php');
 			        	
 			        	
 			        	
-			        	$("#overCalendar").append(i + '::' + $(this).text() + '<Br>');
+			        	//$("#overCalendar").append(i + '::' + $(this).text() + '<Br>');
 			        	
 			        	//set the class so we can find it later
 			        	$(this).addClass('moved');
@@ -504,17 +509,31 @@ require_once('time.lib.php');
 			        	if (i == divLengthValue ){
 			        		
 			        		// if it gets to here everything has been successful so far
+							// convert all addClass('moved') to be a new div
+							
+							collection = jQuery('li.moved:visible');
+							
+							setSelectedElementsToSave (collection,oldName);	
+							
+							// delete the old details
+							// deleteOldElements(
+							
+							var txtStart = start.replace(/:/,"-");
+							
+							deleteSavedDiv ($('#' + parent + txtStart));
+					        
+					        $("* > .moved").removeClass('moved');
+					        
+					        $("#divLength").remove();			        		
 			        		return false;
 			        	}   
 			        
 			        });
 		        
 				}		        
+
 		        
-				// convert all addClass('moved') to be a new div
-										        
-		        
-		        
+
 		        
 		    }  
 		});         
