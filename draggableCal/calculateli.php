@@ -14,24 +14,25 @@ require_once('time.lib.php');
   	<script type="text/javascript" src="jquery.contextMenu.js"></script>
   	<script>
   	
-  	function calculateDailyTotals (dayChosen){
+  	function calculateDailyTotals (dayChosen,el){
 		
-		
-		var collection = jQuery("div[id*='" + dayChosen +  "']");
+		// i have set hidden spans that have the day in the id
+		// eg. span id =  timeSlotsMonday07-45data
+		// this jquery will get all the spans that have an id that has 
+		// the dayChosen (eg. tuesday) 
+		var collection = jQuery("span[id*='" + dayChosen +  "']");
 		
 		var totals  = new Array();
-		
-						
 		collection.each(function(){
 		
+			// get an array of the data that is hidden in the span
+			var spanValues = $(this).text().split(";");
 			
-			var divValues = $(this).text().split(";");
-			
-			var key = divValues[0];
-			var value = divValues[3];
+			var key = spanValues[0];
+			var value = spanValues[3];
 			
 			// name  and time in hours
-			// alert(divValues[0] + ' ; ' + divValues[3]);
+			// alert(spanValues[0] + ' ; ' + spanValues[3]);
 			if (totals[key] == undefined){
 				totals[key] = 0;
 				//alert (key + '::' + totals[key]);
@@ -44,26 +45,72 @@ require_once('time.lib.php');
 			
 		});
 		
-		$("#showTotals").remove();
-		var newDivTotals = '<div id="showTotals" style="background:black; color:white" >';
 		
+		
+		$("#showTotals").remove();
+		
+
+
+		
+		var newDivTotals = '<div id="showTotals" style="position:absolute; background:black; color:white" >';
+		newDivTotals = newDivTotals + '<table bgcolor="#0000FF">';
+		newDivTotals = newDivTotals + '<tr><td id=titleTotals color="#FFFFFF">Details</td></tr>';
+		newDivTotals = newDivTotals + '<tr><td id=textTotals bgcolor="#8888FF">Hello I am a popup table</td></tr></table></div>';
+		$("#overCalendar").append(newDivTotals);  
+		
+		 
+		$("#titleTotals").text(" Totals : " + dayChosen); 
+		var textTotals = '<table>';
 		for (key in totals){
-			newDivTotals = newDivTotals + key + ":" + totals[key] + "<br>";
+			textTotals = textTotals + '<tr><td>' +  key + ":" + totals[key] + "</td></tr>";
 		}		
 		
-		newDivTotals = newDivTotals + "</div>";
+		textTotals = textTotals + "<tr><td> Please click to hide.</td></tr></table>";
 		
-		$("#overCalendar").append(newDivTotals);  	
+		$("#textTotals").html(textTotals);
+			
+		
+		var offset = el.offset();
+		
+		
+		
+		var topOffset = offset.top + 18; 
+		var leftOffset = offset.left + 18;
+		
+		$("#showTotals").show().css("top",topOffset).css("left",leftOffset)
+		.click(function(){
+			$("#showTotals").hide();	
+		})
+		
+																			
+		
 	}
 	
 	
 	
   	// this function is to be able to double click on the div and then delete it and remove selections
-  	function doubleClickSaved (name,count,start,end,parent){
+  	// passing in the element that was clicked
+  	function deleteSavedDiv (el){
   	
+
+  		
+  		
   		var delSaved = confirm("Do you wish to delete?");
   		
+  		
   		if (delSaved){
+  		
+	  		// find the data hidden in the span of the element el
+  			var spanName = el.attr('id') + 'data';  		
+  		
+  		 
+			// get an array of the data that is hidden in the span
+			var spanValues = $('#' + spanName).text().split(";");
+			
+			var start = spanValues[1];
+			var parent = spanValues[4];
+
+  		
   			// convert each li back to normal.
   			// each section has as a class the start date
   			// for any child of the parent
@@ -120,6 +167,8 @@ require_once('time.lib.php');
   	
   	$(document).ready(function(){
 
+
+		$("#hoverPopup").hide();
 		
         var collection;
           
@@ -257,13 +306,17 @@ require_once('time.lib.php');
 		                    		newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle ><img height=10px src="images/zaneinthebaththumb.png"></div>';
 		                    	} 
 		                    	// the ; is important as it is used as a delimiter to calculate stuff later on
-		                    	newDivSave = newDivSave + name + ';' + start + ';' + end + ';' + count * 0.25 + '</div>';	
+		                    	newDivSave = newDivSave + name + ' Duration: ' + count * 0.25;
+		                    	newDivSave = newDivSave + '<span id=' + parent + txtStart + 'data class=hideData style="visible: hidden">' + name + ';' + start + ';' + end + ';' + count * 0.25 + ';' + parent + '</span>'; 
+		                    	newDivSave = newDivSave + '</div>';	
 		                    	
 		                    	
 		                    	
 		                    	// append the new div	                    	
 			                    $("#overCalendar").append(newDivSave);
 			                    
+			                    //hide the data span
+			                    $('#' + parent + txtStart + 'data').hide();
 			                    
 			                    // set the div id to be the name of the parent and the start time
 			                    // eg. timeslotsMonday07-15
@@ -281,7 +334,7 @@ require_once('time.lib.php');
 							    })
 							    // set to delete if double clicked
 			    				.dblclick(function () { 
-	      	 							doubleClickSaved(name,count,start,end,parent)
+	      	 							deleteSavedDiv($(this));
 	      	 							})
 	      	 					// show menu when Right Mouse Clicked
 								.contextMenu({
@@ -306,14 +359,35 @@ require_once('time.lib.php');
 										// var actionDayChosen = "Tuesday";
 										 
 										// alert(actionDayChosen);
-										calculateDailyTotals(actionDayChosen);
+										calculateDailyTotals(actionDayChosen,el);
 																	
 									}		
 									if (action == "showDetails"){
-										alert("test");								
+
+								  		// find the data hidden in the span of the element el
+							  			var spanName = el.attr('id') + 'data';  		
+							  		
+							  		 
+										// get an array of the data that is hidden in the span
+										var spanText = $('#' + spanName).text();
+
+									
+		    							$("#textPopup").text(spanText);
+		    							
+										var offset = el.offset();
+										
+										var topOffset = offset.top + 18; 
+										var leftOffset = offset.left + 18;
+										
+										$("#hoverPopup").show().css("top",topOffset).css("left",leftOffset)
+										.click(function(){
+											$("#hoverPopup").hide();	
+										})
+										
+										$("#textPopup").append("<br> Click to hide");																	
 									}	
 									if (action == "delete"){
-										alert("Please double click the green area to delete");
+										deleteSavedDiv(el);
 									}	
 										
 								});
@@ -375,16 +449,7 @@ require_once('time.lib.php');
 		});         
 		
 		
-		// this is to calculate the subtotals for the day
-		// based on the name entered and the # selected
-		$("#calculate").click(function () {
-		
-			
-			//var dayChosen = $("#daySelect").val();
-			
-			calculateDailyTotals ($("#daySelect").val());
-			
-		});
+
 		
   	});
   	</script>
@@ -568,15 +633,6 @@ if(strpos($user_agent, 'MSIE') !== false)
 
 </div>
 
-<select id=daySelect>
-	<option value=Monday>Monday</option>
-	<option value=Tuesday>Tuesday</option>
-	<option value=Wednesday>Wednesday</option>
-	<option value=Thursday>Thursday</option>
-	<option value=Friday>Friday</option>
-	<option value=Saturday>Saturday</option>
-</select>
-<input type=submit id=calculate value=calculate>
 
 
 
@@ -594,6 +650,12 @@ if(strpos($user_agent, 'MSIE') !== false)
         <a href="#quit">Quit</a>
     </li>
 </ul>
+
+<div id="hoverPopup" style=" position:absolute; top:55; left:44;">
+<table bgcolor="#0000FF">
+<tr><td id=titlePopup color="#FFFFFF">Details</td></tr>
+<tr><td id=textPopup bgcolor="#8888FF">Hello I am a popup table</td></tr></table></div>
+
 
 </body>
 </html>
