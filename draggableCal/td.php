@@ -100,7 +100,7 @@ td {background: #CFD4E6; width: 100px;  font-size: 12px; font-family: Arial;}
 						<div id='div<?php echo $value;?>' style='width:99px;height:99%;overflow:hidden;'>
 							<?php echo $value;?>
 						</div>
-						<textarea id='txt<?php echo $value;?>' style='width:96%;height:90%;background-color:transparent;display:none;' onchange="commentToDiv('<?php echo $value;?>');"></textarea>
+						<textarea id='txt<?php echo $value;?>' style='width:96%;height:90%;background-color:transparent;display:none;color:white;' onchange="commentToDiv('<?php echo $value;?>');"></textarea>
 					</td>
 				</tr>
 		<?php
@@ -112,6 +112,7 @@ td {background: #CFD4E6; width: 100px;  font-size: 12px; font-family: Arial;}
 
 <script>
 function merge(tableName,className){
+	var fail;
 	var spanedHeight = 0;
 	var toBeDel = [];
 	var idFirst="";
@@ -120,7 +121,10 @@ function merge(tableName,className){
 	
 	for(var i=0;i<o.length;i++){
     	//alert(o[i].id+': '+o[i].className);
-	    if(o[i].className == "ui-selectee "+className){
+    	if(o[i].className == "blk" || o[i].className == "blk ui-selected"){
+			fail = "yes";//as 'blk' class found, cancel action
+			i=o.length;//prevent upcoming loops
+    	}else if(o[i].className == "ui-selectee "+className){
 			if(idFirst==""){
 				idFirst = o[i];
 				spanedHeight = spanedHeight + o[i].offsetHeight;
@@ -131,19 +135,26 @@ function merge(tableName,className){
 	        count ++;
 		}
 	}
-
-	for(var i=0;i<toBeDel.length;i++){
-		document.getElementById('tr'+toBeDel[i]).deleteCell(document.getElementById(toBeDel[i]).cellIndex);
+	if(fail!="yes"){
+		for(var i=0;i<toBeDel.length;i++){
+			document.getElementById('tr'+toBeDel[i]).deleteCell(document.getElementById(toBeDel[i]).cellIndex);
+		}
+		idFirstID=idFirst.id;
+		idFirst.rowSpan=count;
+		spanedHeight = spanedHeight+count-1;
+		idFirst.height=spanedHeight+'px';
+		//alert(idFirst.className);
+		idFirst.setAttribute("class", "blk"); 
+		//alert(idFirst.className);
+		idFirst.style.padding='0px';
+	
+		document.getElementById('div'+idFirstID).setAttribute("class", "blk");
+		document.getElementById('div'+idFirstID).innerHTML=""//clear any current booked times
+		document.getElementById('txt'+idFirstID).style.display='block';
+		document.getElementById('div'+idFirstID).style.display='none';
+	}else{
+		alert('Sorry, one or more timeslots already booked');
 	}
-	idFirstID=idFirst.id;
-	idFirst.rowSpan=count;
-	spanedHeight = spanedHeight+count-1;
-	idFirst.height=spanedHeight+'px';
-	idFirst.style.padding='0px';
-
-	document.getElementById('div'+idFirstID).innerHTML=""//clear any current booked times
-	document.getElementById('txt'+idFirstID).style.display='block';
-	document.getElementById('div'+idFirstID).style.display='none';	
 }
 </script>
 		
