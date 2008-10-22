@@ -50,10 +50,12 @@ require_once('time.lib.php');
 		var newDivSave = '<div id="' + parent + txtStart + '" class = "savedDiv" >';
                     
 		if (count == 1){
-			newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle ><img height=10px src="images/zaneinthebaththumb.png"></div>';
+			// newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle ><img height=10px src="images/zaneinthebaththumb.png"></div>';
+			handleID = "#" + parent + txtStart;
 		}
 		else {
 			newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle ><img height=10px src="images/zaneinthebaththumb.png"></div>';
+			handleID = "#handle";
 		} 
                     
 		// the ; is important as it is used as a delimiter to calculate stuff later on
@@ -79,8 +81,8 @@ require_once('time.lib.php');
 		// set the grid - 102 is the width of each column and 15 is the size of each li 
 		.draggable({
 			revert:	true,
-			handle:	"#handle",
-			grid: 	[102,15]
+			handle:	handleID,
+			grid: 	[102,1]
 				    
 		})
 		// set to delete if double clicked
@@ -451,7 +453,7 @@ require_once('time.lib.php');
 		
 			// only accept savedDiv class objects
 		    accept: ".savedDiv", 
-		    tolerance:		'pointer', // this along with the handle option in draggable is to reduce the area that the user can drop to improve accuracy 
+		    tolerance:	'pointer', // this along with the handle option in draggable is to reduce the area that the user can drop to improve accuracy 
 		    drop: function(ev, ui) { 
 		        
 			    // find the data hidden in the span of the element el
@@ -459,14 +461,19 @@ require_once('time.lib.php');
 	  		 	
 				// get an array of the data that is hidden in the span
 				var spanValues = $('#' + spanName).text().split(';');
+				
+				
+				
 		        var divLength = spanValues[4];	
 		        var parent = spanValues[5];
 		        var start = spanValues[1];	  
 		        var oldName = spanValues[0];      
 		        
+		        
 		        $("#divLength").remove();
 		        $("#overCalendar").append("<div id=divLength>" + divLength + "</div>");
 		        $("#divLength").hide();
+		        
 		        
 		        if ($(this).hasClass('saved')){
 		        	// alert ('Invalid Move');
@@ -477,61 +484,85 @@ require_once('time.lib.php');
 		        	//set the class so we can find it later
 		        	$(this).addClass('moved');
 		        	
-		        	// $("#overCalendar").append($(this).parent().attr('id') + ' ' + $(this).text() + '<br>');
+		        	// if only 1 li long, then set things in now
+		        	if (divLength ==1) {
+		        		// if it gets to here everything has been successful so far
+						// convert all addClass('moved') to be a new div
+						
+						collection = jQuery('li.moved:visible');
+						
+						setSelectedElementsToSave (collection,oldName);	
+						
+						// delete the old details
+						// deleteOldElements(
+						
+						var txtStart = start.replace(/:/,"-");
+						
+						deleteSavedDiv ($('#' + parent + txtStart));
+				        
+				        
+				        
+				        $("#divLength").remove();		        	
+		        		
+		        	}
+		        	else {
+			        	
+			        	// $("#overCalendar").append($(this).parent().attr('id') + ' ' + $(this).text() + '<br>');
+				        
+			        	
+				        // get all the rest of the siblings to check if they can be moved 
+				        $(this).nextAll()
+				        .each(function (i){
+				        	
+				        	
+				        	//$("#overCalendar").append(i + '::' + $(this).text() + '<Br>');
+				        	
+				        	//set the class so we can find it later
+				        	$(this).addClass('moved');
+				        	
+				        	if ($(this).hasClass('saved')){
+				        		// alert ('Invalid Move');
+				        		
+				        		
+				        		
+				        		return false;
+				        	}
+				        	
+				        	
+	
+							// retrieve the length fromt the hidden div
+							// we take away 2 as the header of the draggable is not 
+							// in this list and the first of the siblings starts at 0
+					        var divLengthValue = $("#divLength").text();
+					        divLengthValue = parseFloat(divLengthValue) - 2;
+				        	if (i == divLengthValue ){
+				        		
+				        		
+				        		// if it gets to here everything has been successful so far
+								// convert all addClass('moved') to be a new div
+								
+								collection = jQuery('li.moved:visible');
+								
+								setSelectedElementsToSave (collection,oldName);	
+								
+								// delete the old details
+								// deleteOldElements(
+								
+								var txtStart = start.replace(/:/,"-");
+								
+								deleteSavedDiv ($('#' + parent + txtStart));
+						        
+						        
+						        
+						        $("#divLength").remove();			        		
+				        		return false;
+				        	}   
+				        
+				        });
 			        
-		        
-			        // get all the rest of the siblings to check if they can be moved 
-			        $(this).nextAll()
-			        .each(function (i){
-			        	
-			        	
-			        	
-			        	//$("#overCalendar").append(i + '::' + $(this).text() + '<Br>');
-			        	
-			        	//set the class so we can find it later
-			        	$(this).addClass('moved');
-			        	
-			        	if ($(this).hasClass('saved')){
-			        		// alert ('Invalid Move');
-			        		
-			        		
-			        		
-			        		return false;
-			        	}
-			        	
-			        	
-
-						// retrieve the length fromt the hidden div
-						// we take away 2 as the header of the draggable is not 
-						// in this list and the first of the siblings starts at 0
-				        var divLengthValue = $("#divLength").text();
-				        divLengthValue = parseFloat(divLengthValue) - 2;
-			        	if (i == divLengthValue ){
-			        		
-			        		// if it gets to here everything has been successful so far
-							// convert all addClass('moved') to be a new div
-							
-							collection = jQuery('li.moved:visible');
-							
-							setSelectedElementsToSave (collection,oldName);	
-							
-							// delete the old details
-							// deleteOldElements(
-							
-							var txtStart = start.replace(/:/,"-");
-							
-							deleteSavedDiv ($('#' + parent + txtStart));
-					        
-					        
-					        
-					        $("#divLength").remove();			        		
-			        		return false;
-			        	}   
-			        
-			        });
-		        
-				}		        
-
+					}		        
+			} // else if first one is saved
+			 
 		    // clear out any addClass('moved') that was set
 		    // regardless of failure or not
 			$("* > .moved").removeClass('moved');
