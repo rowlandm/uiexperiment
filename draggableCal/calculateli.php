@@ -487,6 +487,8 @@ require_once('time.lib.php');
 		        		// if it gets to here everything has been successful so far
 						// convert all addClass('moved') to be a new div
 						
+						deleteSavedDiv ($('#' + parent + txtStart));
+						
 						collection = jQuery('li.moved:visible');
 						
 						setSelectedElementsToSave (collection,oldName);	
@@ -496,7 +498,7 @@ require_once('time.lib.php');
 						
 						
 						
-						deleteSavedDiv ($('#' + parent + txtStart));
+						
 				        
 				        
      	
@@ -538,18 +540,47 @@ require_once('time.lib.php');
 				        		
 				        		
 				        		// if it gets to here everything has been successful so far
-								// convert all addClass('moved') to be a new div
+
 								
+								// delete the old details before creating the saved details
+								/*	example where moving 30 minute appointment back by 15 minutes
+									these are the classes of the li
+								
+											before			during move				after move
+									09-00	saved 09-00		saved 09-00				
+									09-15	saved 09-00		saved 09-00 moved		saved 09-15
+									09-30					moved					saved 09-15
+									09-45
+								
+									So if we converted the moved to saved first, 09-15 li would then be
+									
+									saved 09-15
+									
+									So if we deleted the saved second, then the 09-15 li would then be
+									
+									09-15
+									
+									which would cause problems later on
+								
+									so we delete the saved from the old ones first before we convert the moved
+								
+								
+								*/ 
+															
+								
+								
+								deleteSavedDiv ($('#' + parent + txtStart));
+
+								// convert all addClass('moved') to be a new div								
 								collection = jQuery('li.moved:visible');
 								
 								setSelectedElementsToSave (collection,oldName);	
 								
-								// delete the old details
-								// deleteOldElements(
+
 								
 								// alert (parent +  '::' + txtStart + '::' +  oldName + '::' + divLength );
 								
-								deleteSavedDiv ($('#' + parent + txtStart));
+								
 	        		
 				        		return false;
 				        	}   
