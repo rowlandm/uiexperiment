@@ -14,6 +14,137 @@ require_once('time.lib.php');
   	<script type="text/javascript" src="jquery.contextMenu.js"></script>
   	<script>
   	
+  	function setSelectedElementsToSave (collection,name,start,end,count){
+  		
+  		var txtStart = start.replace(/:/,"-");
+  	
+		// now clear out the ui-selected class from the selected panels
+		// and then set it to the saved class to block it out
+        collection.each(function() {
+                    
+                    	
+                    
+			//set the new height based on the height of the li height:10px  and bottom of 2px
+			// also set the colors and background to be different, even though it is technically irrelevant
+			// as the div will be placed over it
+            $(this).removeClass('ui-selected').addClass(txtStart).addClass("saved")
+            .unbind("click").css("background","red").css("color","white").css("border-bottom","0px").css("height","12px");
+           				
+    							           					    		
+		});
+                    
+
+		// this is to get the collection's parent and find it's id
+		// eg. timeslotsMonday
+		var parent = collection.parent().attr('id');
+                    
+                    
+		// get the position of the first element so we can stick the div directly on top of it
+		var offset = collection.eq(0).offset();
+		var newHeight = (count * 15) - 2; // the 15 is for the height of each li and the -2 is to take into account the 2px bottom line
+		var newDivSave = '<div id="' + parent + txtStart + '" class = "savedDiv" >';
+                    
+		if (count == 1){
+			newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle ><img height=10px src="images/zaneinthebaththumb.png"></div>';
+		}
+		else {
+			newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle ><img height=10px src="images/zaneinthebaththumb.png"></div>';
+		} 
+                    
+		// the ; is important as it is used as a delimiter to calculate stuff later on
+		newDivSave = newDivSave + name + ' Duration: ' + count * 0.25;
+		newDivSave = newDivSave + '<span id=' + parent + txtStart + 'data class=hideData style="visible: hidden">' + name + ';' + start + ';' + end + ';' + count * 0.25 + ';' + count + ';' + parent + '</span>'; 
+		newDivSave = newDivSave + '</div>';	
+                    
+                    
+                    
+		// append the new div	                    	
+		$("#overCalendar").append(newDivSave);
+                    
+		//hide the data span
+		$('#' + parent + txtStart + 'data').hide();
+                    
+		// set the div id to be the name of the parent and the start time
+		// eg. timeslotsMonday07-15
+                    
+		$("#" + parent + txtStart).show().css("top",offset.top).css("left",offset.left).addClass(txtStart)	            	
+		.css("height",newHeight + "px").css("border-bottom","2px solid black")
+				    
+		// make the overlying div draggable with a handle that helps make the move accurate
+		// set the grid - 102 is the width of each column and 15 is the size of each li 
+		.draggable({
+			revert:	true,
+			handle:	"#handle",
+			grid: 	[102,15]
+				    
+		})
+		// set to delete if double clicked
+		.dblclick(function () { 
+			deleteSavedDiv($(this));
+		})
+		// show menu when Right Mouse Clicked
+		.contextMenu({
+			menu: 'savedDivMenu',
+			inSpeed: 150,
+			outSpeed: 150
+						
+		},
+		function(action, el, pos) {
+			/* alert(
+				'Action: ' + action + '\n\n' +
+				'Element ID: ' + $(el).attr('id') + '\n\n' + 
+				'X: ' + pos.x + '  Y: ' + pos.y + ' (relative to element)\n\n' + 
+				'X: ' + pos.docX + '  Y: ' + pos.docY+ ' (relative to document)'
+				); 
+			*/
+							
+			if (action == "dailyTotals"){
+							
+							
+				var actionDayChosen = el.attr('id').slice(9,-5);
+				// var actionDayChosen = "Tuesday";
+							 
+				// alert(actionDayChosen);
+				calculateDailyTotals(actionDayChosen,el);
+														
+			}		
+			
+			
+			if (action == "showDetails"){
+
+				// find the data hidden in the span of the element el
+				var spanName = el.attr('id') + 'data';  		
+				  		
+				  		 
+				// get an array of the data that is hidden in the span
+				var spanText = $('#' + spanName).text();
+
+						
+				$("#textPopup").text(spanText);
+    						
+				var offset = el.offset();
+							
+				var topOffset = offset.top + 18; 
+				var leftOffset = offset.left + 18;
+							
+				$("#hoverPopup").show().css("top",topOffset).css("left",leftOffset)
+				.click(function(){
+					$("#hoverPopup").hide();	
+				});
+							
+				$("#textPopup").append("<br> Click to hide");																	
+			}	
+			
+			if (action == "delete"){
+				deleteSavedDiv(el);
+			}	
+							
+		});
+  	
+  		
+  	
+  	}
+  	
   	function calculateDailyTotals (dayChosen,el){
 		
 		// i have set hidden spans that have the day in the id
@@ -270,127 +401,11 @@ require_once('time.lib.php');
 								
 							// going to add the start to the class, and it has problems
 							// seeing : when in the class, so changing it to -
-							var txtStart = start.replace(/:/,"-");
 														
 							if (name != null && name != ""){  							
-								// now clear out the ui-selected class from the selected panels
-								// and then set it to the saved class to block it out
-		    	                collection.each(function() {
-		                    	
-		                    		
-		                    	
-									//set the new height based on the height of the li height:10px  and bottom of 2px
-									// also set the colors and background to be different, even though it is technically irrelevant
-									// as the div will be placed over it
-		            	        	$(this).removeClass('ui-selected').addClass(txtStart).addClass("saved")
-		            	        	.unbind("click").css("background","red").css("color","white").css("border-bottom","0px").css("height","12px");
-		           					
-			    							           					    		
-		                	    });
-		                    
-
-		                    	// this is to get the collection's parent and find it's id
-		                    	// eg. timeslotsMonday
-		                    	var parent = collection.parent().attr('id');
-		                    	
-		                    	
-		                    	// get the position of the first element so we can stick the div directly on top of it
-		                    	var offset = collection.eq(0).offset();
-		                    	var newHeight = (count * 15) - 2; // the 15 is for the height of each li and the -2 is to take into account the 2px bottom line
-		                    	var newDivSave = '<div id="' + parent + txtStart + '" class = "savedDiv" >';
-		                    	
-		                    	if (count == 1){
-		                    		newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle ><img height=10px src="images/zaneinthebaththumb.png"></div>';
-		                    	}
-		                    	else {
-		                    		newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle ><img height=10px src="images/zaneinthebaththumb.png"></div>';
-		                    	} 
-		                    	// the ; is important as it is used as a delimiter to calculate stuff later on
-		                    	newDivSave = newDivSave + name + ' Duration: ' + count * 0.25;
-		                    	newDivSave = newDivSave + '<span id=' + parent + txtStart + 'data class=hideData style="visible: hidden">' + name + ';' + start + ';' + end + ';' + count * 0.25 + ';' + count + ';' + parent + '</span>'; 
-		                    	newDivSave = newDivSave + '</div>';	
-		                    	
-		                    	
-		                    	
-		                    	// append the new div	                    	
-			                    $("#overCalendar").append(newDivSave);
-			                    
-			                    //hide the data span
-			                    $('#' + parent + txtStart + 'data').hide();
-			                    
-			                    // set the div id to be the name of the parent and the start time
-			                    // eg. timeslotsMonday07-15
-			                    
-			                    $("#" + parent + txtStart).show().css("top",offset.top).css("left",offset.left).addClass(txtStart)	            	
-							    .css("height",newHeight + "px").css("border-bottom","2px solid black")
-							    
-							    // make the overlying div draggable with a handle that helps make the move accurate
-							    // set the grid - 102 is the width of each column and 15 is the size of each li 
-							    .draggable({
-							    	revert:	true,
-							    	handle:	"#handle",
-							    	grid: 	[102,15]
-							    
-							    })
-							    // set to delete if double clicked
-			    				.dblclick(function () { 
-	      	 							deleteSavedDiv($(this));
-	      	 							})
-	      	 					// show menu when Right Mouse Clicked
-								.contextMenu({
-									menu: 'savedDivMenu',
-									inSpeed: 150,
-									outSpeed: 150
-									
-								},
-								function(action, el, pos) {
-									 /* alert(
-										'Action: ' + action + '\n\n' +
-										'Element ID: ' + $(el).attr('id') + '\n\n' + 
-										'X: ' + pos.x + '  Y: ' + pos.y + ' (relative to element)\n\n' + 
-										'X: ' + pos.docX + '  Y: ' + pos.docY+ ' (relative to document)'
-										); 
-										*/
-										
-									if (action == "dailyTotals"){
-										
-										
-										var actionDayChosen = el.attr('id').slice(9,-5);
-										// var actionDayChosen = "Tuesday";
-										 
-										// alert(actionDayChosen);
-										calculateDailyTotals(actionDayChosen,el);
-																	
-									}		
-									if (action == "showDetails"){
-
-								  		// find the data hidden in the span of the element el
-							  			var spanName = el.attr('id') + 'data';  		
-							  		
-							  		 
-										// get an array of the data that is hidden in the span
-										var spanText = $('#' + spanName).text();
-
-									
-		    							$("#textPopup").text(spanText);
-		    							
-										var offset = el.offset();
-										
-										var topOffset = offset.top + 18; 
-										var leftOffset = offset.left + 18;
-										
-										$("#hoverPopup").show().css("top",topOffset).css("left",leftOffset)
-										.click(function(){
-											$("#hoverPopup").hide();	
-										})
-										
-										$("#textPopup").append("<br> Click to hide");																	
-									}	
-									if (action == "delete"){
-										deleteSavedDiv(el);
-									}	
-										
-								});
+								
+								setSelectedElementsToSave (collection,name,start,end,count);								
+								
 							                	
 							} // end of if name != ""	
 							else {
