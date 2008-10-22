@@ -469,7 +469,7 @@ require_once('time.lib.php');
 		        $("#divLength").hide();
 		        
 		        if ($(this).hasClass('saved')){
-		        	alert ('Invalid Move');
+		        	// alert ('Invalid Move');
 		        	$("#divLength").remove();
 		        }
 		        else {
@@ -492,10 +492,10 @@ require_once('time.lib.php');
 			        	$(this).addClass('moved');
 			        	
 			        	if ($(this).hasClass('saved')){
-			        		alert ('Invalid Move');
+			        		// alert ('Invalid Move');
 			        		
-			        		// clear out any addClass('moved') that was set
-			        		$(this).siblings().removeClass('moved');
+			        		
+			        		
 			        		return false;
 			        	}
 			        	
@@ -522,7 +522,7 @@ require_once('time.lib.php');
 							
 							deleteSavedDiv ($('#' + parent + txtStart));
 					        
-					        $("* > .moved").removeClass('moved');
+					        
 					        
 					        $("#divLength").remove();			        		
 			        		return false;
@@ -532,8 +532,9 @@ require_once('time.lib.php');
 		        
 				}		        
 
-		        
-
+		    // clear out any addClass('moved') that was set
+		    // regardless of failure or not
+			$("* > .moved").removeClass('moved');
 		        
 		    }  
 		});         
