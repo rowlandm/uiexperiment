@@ -468,16 +468,14 @@ require_once('time.lib.php');
 		        var parent = spanValues[5];
 		        var start = spanValues[1];	  
 		        var oldName = spanValues[0];      
+		        var txtStart = start.replace(/:/,"-");
 		        
-		        
-		        $("#divLength").remove();
-		        $("#overCalendar").append("<div id=divLength>" + divLength + "</div>");
-		        $("#divLength").hide();
-		        
-		        
-		        if ($(this).hasClass('saved')){
+		        if ($(this).hasClass('saved') && 
+        		    !(($(this).parent().attr('id') == parent) && 
+        		       $(this).hasClass(txtStart))) 		        
+		        {
 		        	// alert ('Invalid Move');
-		        	$("#divLength").remove();
+
 		        }
 		        else {
 		        	
@@ -496,13 +494,12 @@ require_once('time.lib.php');
 						// delete the old details
 						// deleteOldElements(
 						
-						var txtStart = start.replace(/:/,"-");
+						
 						
 						deleteSavedDiv ($('#' + parent + txtStart));
 				        
 				        
-				        
-				        $("#divLength").remove();		        	
+     	
 		        		
 		        	}
 		        	else {
@@ -520,11 +517,13 @@ require_once('time.lib.php');
 				        	//set the class so we can find it later
 				        	$(this).addClass('moved');
 				        	
-				        	if ($(this).hasClass('saved')){
+					        if ($(this).hasClass('saved') && 
+			        		    !(($(this).parent().attr('id') == parent) && 
+			        		       $(this).hasClass(txtStart))) 				        	
+				        	{
 				        		// alert ('Invalid Move');
 				        		
-				        		
-				        		
+
 				        		return false;
 				        	}
 				        	
@@ -533,8 +532,8 @@ require_once('time.lib.php');
 							// retrieve the length fromt the hidden div
 							// we take away 2 as the header of the draggable is not 
 							// in this list and the first of the siblings starts at 0
-					        var divLengthValue = $("#divLength").text();
-					        divLengthValue = parseFloat(divLengthValue) - 2;
+					        //var divLengthValue = $("#divLength").text();
+					        divLengthValue = parseFloat(divLength) - 2;
 				        	if (i == divLengthValue ){
 				        		
 				        		
@@ -548,13 +547,10 @@ require_once('time.lib.php');
 								// delete the old details
 								// deleteOldElements(
 								
-								var txtStart = start.replace(/:/,"-");
+								// alert (parent +  '::' + txtStart + '::' +  oldName + '::' + divLength );
 								
 								deleteSavedDiv ($('#' + parent + txtStart));
-						        
-						        
-						        
-						        $("#divLength").remove();			        		
+	        		
 				        		return false;
 				        	}   
 				        
