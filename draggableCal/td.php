@@ -9,8 +9,17 @@ $blockedArray = array("10:30","13:00")
                     "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-  <script src="jquery-1.2.6.js"></script>
-
+	<meta http-equiv="pragma" conent="no-cache">
+	<script src="jquery-1.2.6.js"></script>
+	<script>
+	function commentToDiv(IdFirstID){
+		txt = document.getElementById('txt'+IdFirstID);
+		div = document.getElementById('div'+IdFirstID);
+		div.innerHTML=txt.value;
+		div.style.display="block";
+		txt.style.display="none";
+	} 
+	</script>
 <?php  
 $blkCount=0;
 foreach($timeslotArray as $key => $value){
@@ -87,7 +96,12 @@ td {background: #CFD4E6; width: 100px;  font-size: 12px; font-family: Arial;}
 			}else{
 		?>
 				<tr id='tr<?php echo $value;?>'>
-					<td id='<?php echo $value;?>'><div id='div<?php echo $value;?>' style='width:99px;height:99%;overflow:hidden;'><?php echo $value;?></div></td>
+					<td id='<?php echo $value;?>'>
+						<div id='div<?php echo $value;?>' style='width:99px;height:99%;overflow:hidden;'>
+							<?php echo $value;?>
+						</div>
+						<textarea id='txt<?php echo $value;?>' style='width:96%;height:90%;background-color:transparent;display:none;' onchange="commentToDiv('<?php echo $value;?>');"></textarea>
+					</td>
 				</tr>
 		<?php
 			}
@@ -128,15 +142,8 @@ function merge(tableName,className){
 	idFirst.style.padding='0px';
 
 	document.getElementById('div'+idFirstID).innerHTML=""//clear any current booked times
-	
-	comment = document.createElement("textarea");
-	comment.setAttribute("type", "text");
-	comment.setAttribute("name", "comment");
-	comment.setAttribute("id", "comment");
-	comment.setAttribute("style", "width:100%;height:100%;background-color:transparent;");
-	comment.setAttribute("onchange", "document.getElementById('div"+idFirstID+"').innerHTML=this.value;this.style.display='none';");
-	document.getElementById('div'+idFirstID).appendChild(comment); 
-	
+	document.getElementById('txt'+idFirstID).style.display='block';
+	document.getElementById('div'+idFirstID).style.display='none';	
 }
 </script>
 		
