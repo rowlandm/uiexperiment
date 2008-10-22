@@ -108,7 +108,7 @@ require_once('time.lib.php');
 			var spanValues = $('#' + spanName).text().split(";");
 			
 			var start = spanValues[1];
-			var parent = spanValues[4];
+			var parent = spanValues[5];
 
   		
   			// convert each li back to normal.
@@ -307,7 +307,7 @@ require_once('time.lib.php');
 		                    	} 
 		                    	// the ; is important as it is used as a delimiter to calculate stuff later on
 		                    	newDivSave = newDivSave + name + ' Duration: ' + count * 0.25;
-		                    	newDivSave = newDivSave + '<span id=' + parent + txtStart + 'data class=hideData style="visible: hidden">' + name + ';' + start + ';' + end + ';' + count * 0.25 + ';' + parent + '</span>'; 
+		                    	newDivSave = newDivSave + '<span id=' + parent + txtStart + 'data class=hideData style="visible: hidden">' + name + ';' + start + ';' + end + ';' + count * 0.25 + ';' + count + ';' + parent + '</span>'; 
 		                    	newDivSave = newDivSave + '</div>';	
 		                    	
 		                    	
@@ -327,9 +327,9 @@ require_once('time.lib.php');
 							    // make the overlying div draggable with a handle that helps make the move accurate
 							    // set the grid - 102 is the width of each column and 15 is the size of each li 
 							    .draggable({
-							    
+							    	revert:	true,
 							    	handle:	"#handle",
-							    	grid: [102,15]
+							    	grid: 	[102,15]
 							    
 							    })
 							    // set to delete if double clicked
@@ -428,20 +428,76 @@ require_once('time.lib.php');
 		    accept: ".savedDiv", 
 		    tolerance:		'pointer', // this along with the handle option in draggable is to reduce the area that the user can drop to improve accuracy 
 		    drop: function(ev, ui) { 
-		        $(this).append("Dropped! "); 
+		        
+
 		        
 		        
-		        //  find the position of the current droppable object on that day eg. 11
 		        
-		        // get the count of the draggable object eg. 4 ( or one hour) and then divide it by 2 and round down
-		        // these are the number of li's above the current li that need to be selected
 		        
-		        // go through the collection of these li's - if any are of class saved then error out
+			    // find the data hidden in the span of the element el
+	  			var spanName = ui.draggable.attr('id') + 'data';  		
+	  		
+	  		 	
+	  		 	
+	  		 	
+				// get an array of the data that is hidden in the span
+				var spanValues = $('#' + spanName).text().split(';');
+		        var divLength = spanValues[4];		        
 		        
-		        // now go through and add a new div and change the li's as if it was selected
 		        
-		     
+		        $("#overCalendar").append("<div id=divLength>" + divLength + "</div>");
+		        $("#divLength").hide();
 		        
+		        if ($(this).hasClass('saved')){
+		        	alert ('Invalid Move');
+		        	
+		        }
+		        else {
+		        	
+		        	//set the class so we can find it later
+		        	$(this).addClass('moved');
+		        	
+		        	$("#overCalendar").append($(this).parent().attr('id') + ' ' + $(this).text() + '<br>');
+			        
+		        
+			        // get all the rest of the siblings to check if they can be moved 
+			        $(this).nextAll()
+			        .each(function (i){
+			        	
+			        	
+			        	
+			        	$("#overCalendar").append(i + '::' + $(this).text() + '<Br>');
+			        	
+			        	//set the class so we can find it later
+			        	$(this).addClass('moved');
+			        	
+			        	if ($(this).hasClass('saved')){
+			        		alert ('Invalid Move');
+			        		
+			        		// clear out any addClass('moved') that was set
+			        		$(this).siblings().removeClass('moved');
+			        		return false;
+			        	}
+			        	
+			        	
+
+						// retrieve the length fromt the hidden div
+						// we take away 2 as the header of the draggable is not 
+						// in this list and the first of the siblings starts at 0
+				        var divLengthValue = $("#divLength").text();
+				        divLengthValue = parseFloat(divLengthValue) - 2;
+			        	if (i == divLengthValue ){
+			        		
+			        		// if it gets to here everything has been successful so far
+			        		return false;
+			        	}   
+			        
+			        });
+		        
+				}		        
+		        
+				// convert all addClass('moved') to be a new div
+										        
 		        
 		        
 		        
