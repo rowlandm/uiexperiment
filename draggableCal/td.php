@@ -87,7 +87,7 @@ td {background: #CFD4E6; width: 100px;  font-size: 12px; font-family: Arial;}
 			}else{
 		?>
 				<tr id='tr<?php echo $value;?>'>
-					<td id='<?php echo $value;?>'><?php echo $value;?></td>
+					<td id='<?php echo $value;?>'><div id='div<?php echo $value;?>' style='width:99px;height:99%;overflow:hidden;'><?php echo $value;?></div></td>
 				</tr>
 		<?php
 			}
@@ -121,18 +121,21 @@ function merge(tableName,className){
 	for(var i=0;i<toBeDel.length;i++){
 		document.getElementById('tr'+toBeDel[i]).deleteCell(document.getElementById(toBeDel[i]).cellIndex);
 	}
+	idFirstID=idFirst.id;
 	idFirst.rowSpan=count;
 	spanedHeight = spanedHeight+count-1;
 	idFirst.height=spanedHeight+'px';
 	idFirst.style.padding='0px';
-	idFirst.innerHTML="";
+
+	document.getElementById('div'+idFirstID).innerHTML=""//clear any current booked times
 	
 	comment = document.createElement("textarea");
 	comment.setAttribute("type", "text");
 	comment.setAttribute("name", "comment");
 	comment.setAttribute("id", "comment");
-	comment.setAttribute("style", "width:90%;height:80%;");
-	idFirst.appendChild(comment); 
+	comment.setAttribute("style", "width:100%;height:100%;background-color:transparent;");
+	comment.setAttribute("onchange", "document.getElementById('div"+idFirstID+"').innerHTML=this.value;this.style.display='none';");
+	document.getElementById('div'+idFirstID).appendChild(comment); 
 	
 }
 </script>
