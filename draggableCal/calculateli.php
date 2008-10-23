@@ -51,7 +51,7 @@ require_once('time.lib.php');
     		
     		
     		
-			$('#inputDiv :input:visible:enabled').keyup(function(e) {
+			$('#inputDiv :input:visible:enabled[@type=text]').keyup(function(e) {
 
 				if(e.keyCode == 27) {
 					$('#cancelSubmit').click();
@@ -63,6 +63,8 @@ require_once('time.lib.php');
 					$('#inputSubmit').click();
 				}
 			});
+			
+			
 						
 			var topOffset  = pos.docY + 8; 
 			var leftOffset = pos.docX + 8 ; 
@@ -525,7 +527,19 @@ require_once('time.lib.php');
 							
 		});
   	
-  		
+  		// now save this into the database
+  		// $('#userNameInput').?
+		
+		var postData = 'name=John&location=Boston';
+		
+  		$.ajax({
+			type: "POST",
+		   	url: "ajaxcal.php",
+		   	data: postData,
+		   	success: function(msg){
+		    alert( "Data Saved: " + msg );
+		   	}
+		});
   	
   	}
   	
@@ -809,18 +823,19 @@ require_once('time.lib.php');
 							
 							$('#overCalendar').append(newInputDiv);
 			    			
-							$('#inputDiv :input:visible:enabled').keyup(function(e) {
-
+							$('#inputDiv :input:visible:enabled[@type=text]').keyup(function(e) {
+				
 								if(e.keyCode == 27) {
 									$('#cancelSubmit').click();
 								}
-
+				
 							
 								//alert(e.keyCode);
 								if(e.keyCode == 13) {
 									$('#inputSubmit').click();
 								}
 							});
+
 										
 							var topOffset  = e.pageY  - 100; 
 							var leftOffset = e.pageX + 18 ; 
@@ -1082,6 +1097,20 @@ if(strpos($user_agent, 'MSIE') !== false)
 
 </head>
 <body>
+
+
+<div id=userName>
+
+	
+	<select  id=userNameInput>
+	
+		<option value=rowland.mosbergen>rowland.mosbergen</option>
+		<!--   <option value=corey.evans>corey.evans</option> -->
+		
+	</select>
+	
+
+</div>
 
 <div id=overCalendar>
 
