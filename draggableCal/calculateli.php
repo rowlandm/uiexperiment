@@ -136,8 +136,9 @@ require_once('time.lib.php');
 		
 			if (newCount == 1){
 				// also reset the draggable handle of the div etc if count = 1
+				$("#handle" + parent + txtStart).hide();
 				
-				
+				// FIXME: RHM cannot seem to reset the handle of the draggable element to be the entire element
 			}
 		
 		
@@ -230,6 +231,10 @@ require_once('time.lib.php');
 			// this actually stops the div from resizing
 			// ui.element.html(newHTML);
 
+			// if old count is 1 then it would have been expanded, so show the handle
+			if (oldCount ==1){
+				$("#handle" + parent + txtStart).show();
+			}
 		
 		} //end of if saved 
 		else {
@@ -280,16 +285,9 @@ require_once('time.lib.php');
 		var newHeight = (count * 15) - 2; // the 15 is for the height of each li and the -2 is to take into account the 2px bottom line
 		var newDivSave = '<div id="' + parent + txtStart + '" class = "savedDiv" >';
                     
-		if (count == 1){
-			// newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle ><img height=10px src="images/zaneinthebaththumb.png"></div>';
-			handleID = "#" + parent + txtStart;
-		}
-		else {
-			newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle ><img height=10px src="images/zaneinthebaththumb.png"></div>';
-			handleID = "#handle";
-		} 
                     
 		// the ; is important as it is used as a delimiter to calculate stuff later on
+		newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle'  + parent + txtStart + '><img height=10px src="images/zaneinthebaththumb.png"></div>';
 		newDivSave = newDivSave + '<span id=' + parent + txtStart + 'display > ' + name + ' Duration: ' + count * 0.25 + '</span>';
 		newDivSave = newDivSave + '<span id=' + parent + txtStart + 'data class=hideData style="visible: hidden">' + name + ';' + start + ';' + end + ';' + count * 0.25 + ';' + count + ';' + parent + '</span>'; 
 		newDivSave = newDivSave + '</div>';	
@@ -301,6 +299,17 @@ require_once('time.lib.php');
                     
 		//hide the data span
 		$('#' + parent + txtStart + 'data').hide();
+
+		// if count ==1 set handle to be the whole object
+		// also hide the top handle
+		if (count == 1){
+			handleID = "#" + parent + txtStart;
+			$("#handle" + parent + txtStart).hide();
+		}
+		else {
+			handleID = "#handle" + parent + txtStart;
+		} 
+
                     
 		// set the div id to be the name of the parent and the start time
 		// eg. timeslotsMonday07-15
@@ -365,9 +374,17 @@ require_once('time.lib.php');
 				// var actionDayChosen = "Tuesday";
 							 
 				// alert(actionDayChosen);
-				calculateDailyTotals(actionDayChosen,el);
+				calculateTotals(actionDayChosen,el);
 														
 			}		
+			if (action == "weeklyTotals"){
+							
+							
+				// alert(actionDayChosen);
+				calculateTotals('weekly',el);
+														
+			}	
+			
 			
 			
 			if (action == "showDetails"){
@@ -411,13 +428,21 @@ require_once('time.lib.php');
   	
   	}
   	
-  	function calculateDailyTotals (dayChosen,el){
+  	function calculateTotals (dayChosen,el){
 		
 		// i have set hidden spans that have the day in the id
 		// eg. span id =  timeSlotsMonday07-45data
 		// this jquery will get all the spans that have an id that has 
 		// the dayChosen (eg. tuesday)
-		var collection = jQuery("span[id*='data'][id*='" + dayChosen +  "']");
+		
+		var collection = '';
+		
+		if (dayChosen == 'weekly') {
+			collection = jQuery("span[id*='data']");
+		}
+		else {
+			collection = jQuery("span[id*='data'][id*='" + dayChosen +  "']");
+		} 
 		
 		var totals  = new Array();
 		collection.each(function(){
@@ -455,8 +480,14 @@ require_once('time.lib.php');
 		newDivTotals = newDivTotals + '<tr><td id=textTotals bgcolor="#8888FF">Hello I am a popup table</td></tr></table></div>';
 		$("#overCalendar").append(newDivTotals);  
 		
+		if (dayChosen == 'weekly'){
+			$("#titleTotals").text(" Weekly Total ");
+		}
+		else{ 
+			$("#titleTotals").text(" Total for " + dayChosen);
+		}
+		
 		 
-		$("#titleTotals").text(" Totals : " + dayChosen); 
 		var textTotals = '<table>';
 		for (key in totals){
 			textTotals = textTotals + '<tr><td>' +  key + ":" + totals[key] + "</td></tr>";
@@ -1045,6 +1076,10 @@ if(strpos($user_agent, 'MSIE') !== false)
     <li class="dailyTotals">
         <a href="#dailyTotals">Daily Totals</a>
     </li>    
+    <li class="weeklyTotals">
+        <a href="#weeklyTotals">Weekly Totals</a>
+    </li>    
+    
     <li class="delete">
         <a href="#delete">Delete</a>
     </li>
