@@ -155,7 +155,7 @@ require_once('time.lib.php');
 			collectionCurrent.eq(parseFloat(oldCount) - 1).nextAll()
 	        .each(function (i){
 	        	
-	        	$('#overCalendar').append(i + '::' + diffRoundCount +  '::' + $(this).text() + '<br>');
+	        	// $('#overCalendar').append(i + '::' + diffRoundCount +  '::' + $(this).text() + '<br>');
 	        	
 	        	
 	        	if ( $(this).hasClass('saved')){
@@ -171,12 +171,12 @@ require_once('time.lib.php');
 	        	
 	        	if (i == (diffRoundCount-1)){
 	        		
-	        		var query = "#" + parent + ' > li.resize';
+	        		var query = "#" + parent + ' > li.resized';
 					collectionConvertToSaved = jQuery(query);
 					
 					collectionConvertToSaved.each(function(){
 						
-						$(this).removeClass('resized').addClass('saved').addClass(txtStart);
+						$(this).removeClass('resized').addClass('saved').addClass(txtStart).css("background","red").css("color","white").css("border-bottom","0px").css("height","12px");
 						
 					});
 	        		
