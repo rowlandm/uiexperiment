@@ -220,14 +220,15 @@ require_once('time.lib.php');
 			var spanName = ui.element.attr('id') + 'data';
 			*/  		
 			$('#' + spanName).text(spanValues[0] + ';' + spanValues[1] + ';' + spanValues[2] + ';' + spanValues[3] + ';' + spanValues[4] + ';' + spanValues[5]);					
-			var newHTML = ui.element.html();
+			
 			
 			
 			var oldDuration = oldCount * 0.25;
 			
-			newHTML = newHTML.replace('Duration: ' + oldDuration + '<span','Duration: ' + spanValues[3] + '<span' );
+			$('#' + parent + txtStart + 'display').text(spanValues[0] + ' Duration: ' + spanValues[3]);
 			
-			ui.element.html(newHTML);
+			// this actually stops the div from resizing
+			// ui.element.html(newHTML);
 
 		
 		} //end of if saved 
@@ -288,7 +289,7 @@ require_once('time.lib.php');
 		} 
                     
 		// the ; is important as it is used as a delimiter to calculate stuff later on
-		newDivSave = newDivSave + name + ' Duration: ' + count * 0.25;
+		newDivSave = newDivSave + '<span id=' + parent + txtStart + 'display > ' + name + ' Duration: ' + count * 0.25 + '</span>';
 		newDivSave = newDivSave + '<span id=' + parent + txtStart + 'data class=hideData style="visible: hidden">' + name + ';' + start + ';' + end + ';' + count * 0.25 + ';' + count + ';' + parent + '</span>'; 
 		newDivSave = newDivSave + '</div>';	
                     
