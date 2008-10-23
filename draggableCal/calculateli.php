@@ -234,7 +234,8 @@ require_once('time.lib.php');
 		} //end of if saved 
 		else {
 			// reset the height back to the old height
-			ui.element.height(ui.originalSize.height + 'px');
+			var oldHeight = ui.originalSize.height - 2;
+			ui.element.height( oldHeight + 'px');
 			
 		} 
 		
@@ -414,8 +415,8 @@ require_once('time.lib.php');
 		// i have set hidden spans that have the day in the id
 		// eg. span id =  timeSlotsMonday07-45data
 		// this jquery will get all the spans that have an id that has 
-		// the dayChosen (eg. tuesday) 
-		var collection = jQuery("span[id*='" + dayChosen +  "']");
+		// the dayChosen (eg. tuesday)
+		var collection = jQuery("span[id*='data'][id*='" + dayChosen +  "']");
 		
 		var totals  = new Array();
 		collection.each(function(){
