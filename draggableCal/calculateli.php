@@ -321,6 +321,7 @@ require_once('time.lib.php');
 			transparent: true,
 			helper: "proxy",
 			grid: [0,5],
+			containment: $('#overCalendar'),
 			stop: function(ev, ui){
 
 				stopResizing(ev,ui);		
