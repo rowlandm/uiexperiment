@@ -529,15 +529,34 @@ require_once('time.lib.php');
   	
   		// now save this into the database
   		// $('#userNameInput').?
+		/*
+		name + ';' + start + ';' 
+					+ end + ';' + count * 0.25 + ';' + count + ';' + parent + ';' 
+					+ inputType + ';' + inputCode+ ';' + inputDetails 
+		*/
 		
-		var postData = 'name=John&location=Boston';
+		
+		var postData = 'username=' + $('#userNameInput').val() + '&name=' + name + '&start=' + start + '&end=' + end + '&htmlID=' + parent + start  + '&inputType=' + inputType
+		+ '&inputCode=' + inputCode + '&inputDetails=' + inputDetails + '&action=add';
+		
+
 		
   		$.ajax({
 			type: "POST",
 		   	url: "ajaxcal.php",
 		   	data: postData,
 		   	success: function(msg){
-		    alert( "Data Saved: " + msg );
+		   		$('#overCalendar > span:last').remove();
+		    	$('#overCalendar').append('<span>'  + msg + '::' + parent + start + '</span>');
+		    	
+		      	
+		      	var pos = msg.indexOf("SUCCESS");
+				if (pos >= 0)
+				{
+					
+					$('#' + parent + txtStart).css("background","green");
+				}
+		    	
 		   	}
 		});
   	
@@ -1063,8 +1082,6 @@ require_once('time.lib.php');
 		});         
 		
 		
-
-		
   	});
   	</script>
 
@@ -1074,7 +1091,7 @@ ul { list-style: none; margin:0px; padding:0px;}
 .ui-selected { background: #black; color: #FFF; border-bottom: 2px solid #727EA3;}
 .ui-selecting { background: #CFD499; } 
 
-.savedDiv {background: green; position:absolute; font-size: 9px; width: 100px; }
+.savedDiv {background: orange; position:absolute; font-size: 9px; width: 100px; }
 
 
 li {border-bottom: 2px solid black;background: #CFD4E6; height:10px; width: 100px; margin-top:0px; font-size: 9px; font-family: Arial; padding-top: 3px; }
