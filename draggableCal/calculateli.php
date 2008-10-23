@@ -220,7 +220,8 @@ require_once('time.lib.php');
 			/* ui.element					
 			var spanName = ui.element.attr('id') + 'data';
 			*/  		
-			$('#' + spanName).text(spanValues[0] + ';' + spanValues[1] + ';' + spanValues[2] + ';' + spanValues[3] + ';' + spanValues[4] + ';' + spanValues[5]);					
+			$('#' + spanName).text(spanValues[0] + ';' + spanValues[1] + ';' + spanValues[2] + ';' + spanValues[3] 
+			+ ';' + spanValues[4] + ';' + spanValues[5] + ';' + spanValues[6] + ';' + spanValues[7] + ';' + spanValues[8]);					
 			
 			
 			
@@ -252,6 +253,11 @@ require_once('time.lib.php');
   	
   	function setSelectedElementsToSave (collection,name,inputType,inputCode,inputDetails){
   		
+  		
+  		name = name.replace(";",",");
+  		inputType = inputType.replace(";",",");
+  		inputCode = inputCode.replace(";",",");
+  		inputDetails = inputDetails.replace(";",",");
   		
 		var count = collection.size();
 		var start = collection.eq(0).text();
@@ -388,6 +394,91 @@ require_once('time.lib.php');
 														
 			}	
 			
+			if (action == "edit"){
+			
+				// find the data hidden in the span of the element el
+				var spanName = el.attr('id') + 'data';  		
+				  		
+				  		 
+				// get an array of the data that is hidden in the span
+				var spanText = $('#' + spanName).text();
+				
+				var spanValues = spanText.split(';');				
+			
+				
+			
+				// clear out any old input divs
+				$("#inputDiv").remove();	
+				
+				var newInputDiv = '<div id="inputDiv" style="position:absolute; top:55; left:44;">' + 
+				' <table bgcolor="#0000FF"> ' + 
+				' <tr><td id=inputDivTitle color="#FFFFFF">Details</td></tr> ' + 
+				' <tr><td bgcolor="#8888FF">Name:</td><td> <input id=inputName type=text> </td></tr> ' + 
+				' <tr><td bgcolor="#8888FF">Type:</td><td> <input id=inputType type=text> </td></tr> ' +
+				' <tr><td bgcolor="#8888FF">Job:</td><td> <input id=inputCode type=text> </td></tr> ' +
+				' <tr><td bgcolor="#8888FF">Details:</td><td> <textarea id=inputDetails></textarea> </td></tr> ' +
+				' <tr><td colspan=2 bgcolor="#8888FF"><input type=submit id=inputSubmit value=Submit ><input type=submit id=cancelSubmit value=Cancel </td></tr> ' +
+				' </table></div> ';
+				
+				$('#overCalendar').append(newInputDiv);
+	    		
+	    		$('#inputName').val(spanValues[0]);
+	    		$('#inputType').val(spanValues[6]);
+	    		$('#inputCode').val(spanValues[7]);
+	    		$('#inputDetails').val(spanValues[8]);
+	    		
+	    		
+	    		
+				$('#inputDiv :input:visible:enabled').keyup(function(e) {
+	
+					if(e.keyCode == 27) {
+						$('#cancelSubmit').click();
+					}
+	
+				
+					//alert(e.keyCode);
+					if(e.keyCode == 13) {
+						$('#inputSubmit').click();
+					}
+				});
+							
+				var topOffset  = pos.docY + 8; 
+				var leftOffset = pos.docX + 8 ; 
+				
+				$('#inputDivTitle').text('Add new appointment');
+	
+				$("#inputDiv").show().css("width","500px")
+				.css("top",topOffset).css("left",leftOffset);
+											
+				$('#cancelSubmit').click(function(){
+					$("#inputDiv").hide();	
+				});
+				
+				// get the focus on the first text area
+				$("#inputDiv :input:visible:enabled:first").focus();
+				
+				
+				$('#inputSubmit').click(function(){
+					$("#inputDiv").hide();	
+					
+	
+					// reset the div with the new details
+					
+					spanValues[0] = $('#inputName').val();
+	    			spanValues[6] = $('#inputType').val();
+	    			spanValues[7] = $('#inputCode').val();
+	    			spanValues[8] = $('#inputDetails').val();
+					
+					
+					$('#' + spanName).text(spanValues[0] + ';' + spanValues[1] + ';' + spanValues[2] + ';' + spanValues[3] 
+					+ ';' + spanValues[4] + ';' + spanValues[5] + ';' + spanValues[6] + ';' + spanValues[7] + ';' + spanValues[8]);					
+					
+					// change the display
+					$('#' + el.attr('id') + 'display').text(spanValues[0] + ' Duration: ' + spanValues[3]);  
+					
+				})			
+		
+			}
 			
 			
 			if (action == "showDetails"){
@@ -1141,6 +1232,9 @@ if(strpos($user_agent, 'MSIE') !== false)
     <li class="weeklyTotals">
         <a href="#weeklyTotals">Weekly Totals</a>
     </li>    
+    <li class="edit">
+        <a href="#edit">Edit</a>
+    </li>
     
     <li class="delete">
         <a href="#delete">Delete</a>
