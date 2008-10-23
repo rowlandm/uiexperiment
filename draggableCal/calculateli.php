@@ -14,6 +14,94 @@ require_once('time.lib.php');
   	<script type="text/javascript" src="jquery.contextMenu.js"></script>
   	<script>
   	
+  	
+  	function editSavedDiv (el,pos){
+		
+			// find the data hidden in the span of the element el
+			var spanName = el.attr('id') + 'data';  		
+			  		
+			  		 
+			// get an array of the data that is hidden in the span
+			var spanText = $('#' + spanName).text();
+			
+			var spanValues = spanText.split(';');				
+		
+			
+		
+			// clear out any old input divs
+			$("#inputDiv").remove();	
+			
+			var newInputDiv = '<div id="inputDiv" style="position:absolute; top:55; left:44;">' + 
+			' <table bgcolor="#0000FF"> ' + 
+			' <tr><td id=inputDivTitle color="#FFFFFF">Details</td></tr> ' + 
+			' <tr><td bgcolor="#8888FF">Name:</td><td> <input id=inputName type=text> </td></tr> ' + 
+			' <tr><td bgcolor="#8888FF">Type:</td><td> <input id=inputType type=text> </td></tr> ' +
+			' <tr><td bgcolor="#8888FF">Job:</td><td> <input id=inputCode type=text> </td></tr> ' +
+			' <tr><td bgcolor="#8888FF">Details:</td><td> <textarea id=inputDetails></textarea> </td></tr> ' +
+			' <tr><td colspan=2 bgcolor="#8888FF"><input type=submit id=inputSubmit value=Submit ><input type=submit id=cancelSubmit value=Cancel </td></tr> ' +
+			' </table></div> ';
+			
+			$('#overCalendar').append(newInputDiv);
+    		$('#inputDiv').hide();
+    		
+    		$('#inputName').val(spanValues[0]);
+    		$('#inputType').val(spanValues[6]);
+    		$('#inputCode').val(spanValues[7]);
+    		$('#inputDetails').val(spanValues[8]);
+    		
+    		
+    		
+			$('#inputDiv :input:visible:enabled').keyup(function(e) {
+
+				if(e.keyCode == 27) {
+					$('#cancelSubmit').click();
+				}
+
+			
+				//alert(e.keyCode);
+				if(e.keyCode == 13) {
+					$('#inputSubmit').click();
+				}
+			});
+						
+			var topOffset  = pos.docY + 8; 
+			var leftOffset = pos.docX + 8 ; 
+			
+			$('#inputDivTitle').text('Add new appointment');
+
+			$("#inputDiv").show().css("width","500px")
+			.css("top",topOffset).css("left",leftOffset);
+										
+			$('#cancelSubmit').click(function(){
+				$("#inputDiv").hide();	
+			});
+			
+			// get the focus on the first text area
+			$("#inputDiv :input:visible:enabled:first").focus();
+			
+			
+			$('#inputSubmit').click(function(){
+				$("#inputDiv").hide();	
+				
+
+				// reset the div with the new details
+				
+				spanValues[0] = $('#inputName').val();
+    			spanValues[6] = $('#inputType').val();
+    			spanValues[7] = $('#inputCode').val();
+    			spanValues[8] = $('#inputDetails').val();
+				
+				
+				$('#' + spanName).text(spanValues[0] + ';' + spanValues[1] + ';' + spanValues[2] + ';' + spanValues[3] 
+				+ ';' + spanValues[4] + ';' + spanValues[5] + ';' + spanValues[6] + ';' + spanValues[7] + ';' + spanValues[8]);					
+				
+				// change the display
+				$('#' + el.attr('id') + 'display').text(spanValues[0] + ' Duration: ' + spanValues[3]);  
+				
+			});			
+	} //function editSavedDiv
+	
+					  	
   	function stopResizing (ev,ui){
 		/* Two scenarios
 		
@@ -395,88 +483,7 @@ require_once('time.lib.php');
 			}	
 			
 			if (action == "edit"){
-			
-				// find the data hidden in the span of the element el
-				var spanName = el.attr('id') + 'data';  		
-				  		
-				  		 
-				// get an array of the data that is hidden in the span
-				var spanText = $('#' + spanName).text();
-				
-				var spanValues = spanText.split(';');				
-			
-				
-			
-				// clear out any old input divs
-				$("#inputDiv").remove();	
-				
-				var newInputDiv = '<div id="inputDiv" style="position:absolute; top:55; left:44;">' + 
-				' <table bgcolor="#0000FF"> ' + 
-				' <tr><td id=inputDivTitle color="#FFFFFF">Details</td></tr> ' + 
-				' <tr><td bgcolor="#8888FF">Name:</td><td> <input id=inputName type=text> </td></tr> ' + 
-				' <tr><td bgcolor="#8888FF">Type:</td><td> <input id=inputType type=text> </td></tr> ' +
-				' <tr><td bgcolor="#8888FF">Job:</td><td> <input id=inputCode type=text> </td></tr> ' +
-				' <tr><td bgcolor="#8888FF">Details:</td><td> <textarea id=inputDetails></textarea> </td></tr> ' +
-				' <tr><td colspan=2 bgcolor="#8888FF"><input type=submit id=inputSubmit value=Submit ><input type=submit id=cancelSubmit value=Cancel </td></tr> ' +
-				' </table></div> ';
-				
-				$('#overCalendar').append(newInputDiv);
-	    		
-	    		$('#inputName').val(spanValues[0]);
-	    		$('#inputType').val(spanValues[6]);
-	    		$('#inputCode').val(spanValues[7]);
-	    		$('#inputDetails').val(spanValues[8]);
-	    		
-	    		
-	    		
-				$('#inputDiv :input:visible:enabled').keyup(function(e) {
-	
-					if(e.keyCode == 27) {
-						$('#cancelSubmit').click();
-					}
-	
-				
-					//alert(e.keyCode);
-					if(e.keyCode == 13) {
-						$('#inputSubmit').click();
-					}
-				});
-							
-				var topOffset  = pos.docY + 8; 
-				var leftOffset = pos.docX + 8 ; 
-				
-				$('#inputDivTitle').text('Add new appointment');
-	
-				$("#inputDiv").show().css("width","500px")
-				.css("top",topOffset).css("left",leftOffset);
-											
-				$('#cancelSubmit').click(function(){
-					$("#inputDiv").hide();	
-				});
-				
-				// get the focus on the first text area
-				$("#inputDiv :input:visible:enabled:first").focus();
-				
-				
-				$('#inputSubmit').click(function(){
-					$("#inputDiv").hide();	
-					
-	
-					// reset the div with the new details
-					
-					spanValues[0] = $('#inputName').val();
-	    			spanValues[6] = $('#inputType').val();
-	    			spanValues[7] = $('#inputCode').val();
-	    			spanValues[8] = $('#inputDetails').val();
-					
-					
-					$('#' + spanName).text(spanValues[0] + ';' + spanValues[1] + ';' + spanValues[2] + ';' + spanValues[3] 
-					+ ';' + spanValues[4] + ';' + spanValues[5] + ';' + spanValues[6] + ';' + spanValues[7] + ';' + spanValues[8]);					
-					
-					// change the display
-					$('#' + el.attr('id') + 'display').text(spanValues[0] + ' Duration: ' + spanValues[3]);  
-					
-				})			
+					editSavedDiv(el,pos);
 		
 			}
 			
@@ -684,6 +691,11 @@ require_once('time.lib.php');
   	
   	
   	
+  	
+  	/*
+  	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Start of the document ready !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  	*/
+  	
   	$(document).ready(function(){
 
 
@@ -691,7 +703,7 @@ require_once('time.lib.php');
 		
         var collection;
           
-          
+        
           
         // This is to set all ul tags that are in the overCalendar DIV to be selectable - includes li tags too
        	$('ul').selectable({
@@ -785,7 +797,7 @@ require_once('time.lib.php');
 							// clear out any old input divs
 							$("#inputDiv").remove();	
 							
-							var newInputDiv = '<div id="inputDiv" style="position:absolute; top:55; left:44;">' + 
+							var newInputDiv = '<div id="inputDiv" style=" position:absolute; top:55; left:44;">' + 
 							' <table bgcolor="#0000FF"> ' + 
 							' <tr><td id=inputDivTitle color="#FFFFFF">Details</td></tr> ' + 
 							' <tr><td bgcolor="#8888FF">Name:</td><td> <input id=inputName type=text> </td></tr> ' + 
@@ -820,6 +832,13 @@ require_once('time.lib.php');
 														
 							$('#cancelSubmit').click(function(){
 								$("#inputDiv").hide();	
+								// if no name then 
+								// reset all the selections
+    			                collection.each(function() {
+        	    	    	    	
+            	    	    		$(this).removeClass('ui-selected');
+           					
+                	    		});										
 							});
 							
 							// get the focus on the first text area
@@ -1065,14 +1084,30 @@ if(strpos($user_agent, 'MSIE') !== false)
 <body>
 
 <div id=overCalendar>
+
+	<?php
+	
+	$dateToday = getdate();
+	
+	// echo $dateToday[weekday] . '::' . $dateToday[mday] . '::' . $dateToday[wday];
+	
+	$daysFromMonday = $dateToday[wday] -1;
+	
+	$date = new DateTime();
+	$date->modify("-" . $daysFromMonday . "day");
+	
+	
+	?>
+
 <table CELLSPACING=0>
 	<tr><td>
 
 
 	</td>
 	<td>
-	Monday
-	<ul id="timeslotsMonday">
+	<?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+	
+	<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
 	<?php
 	
 	$start = "05:45";
@@ -1100,8 +1135,15 @@ if(strpos($user_agent, 'MSIE') !== false)
 	</ul>
 	</td>
 	<td>
-	Tuesday
-	<ul id="timeslotsTuesday">
+
+	<?php 
+	$date->modify("+1 day");
+	
+	?>
+	<?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+	<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
+	
+
 	<?php
 	$nBlocked=0;
 	$timeslotArray = timeslotArray($start,$end,$slots,$format);
@@ -1123,8 +1165,14 @@ if(strpos($user_agent, 'MSIE') !== false)
 	</ul>	
 	</td>
 	<td>
-	Wednesday
-	<ul id="timeslotsWednesday">
+	<?php 
+	$date->modify("+1 day");
+	
+	?>
+	<?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+	<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
+
+
 	<?php
 	$nBlocked=0;
 	$timeslotArray = timeslotArray($start,$end,$slots,$format);
@@ -1146,8 +1194,12 @@ if(strpos($user_agent, 'MSIE') !== false)
 	</ul>	
 	</td>
 	<td>
-	Thursday
-	<ul id="timeslotsThursday">
+	<?php 
+	$date->modify("+1 day");
+	
+	?>
+	<?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+	<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
 	<?php
 	$nBlocked=0;
 	$timeslotArray = timeslotArray($start,$end,$slots,$format);
@@ -1169,8 +1221,12 @@ if(strpos($user_agent, 'MSIE') !== false)
 	</ul>	
 	</td>
 	<td>
-	Friday
-	<ul id="timeslotsFriday">
+	<?php 
+	$date->modify("+1 day");
+	
+	?>
+	<?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+	<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
 	<?php
 	$nBlocked=0;
 	$timeslotArray = timeslotArray($start,$end,$slots,$format);
@@ -1192,8 +1248,11 @@ if(strpos($user_agent, 'MSIE') !== false)
 	</ul>	
 	</td>
 	<td>
-	Saturday
-	<ul id="timeslotsSaturday">
+	<?php 
+	$date->modify("+1 day");
+	?>
+	<?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+	<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
 	<?php
 	$nBlocked=0;
 	$timeslotArray = timeslotArray($start,$end,$slots,$format);
