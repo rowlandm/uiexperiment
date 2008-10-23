@@ -250,7 +250,7 @@ require_once('time.lib.php');
 		$("* > .resized").removeClass('resized');
 	} //  stopResizing	
   	
-  	function setSelectedElementsToSave (collection,name){
+  	function setSelectedElementsToSave (collection,name,inputType,inputCode,inputDetails){
   		
   		
 		var count = collection.size();
@@ -289,7 +289,10 @@ require_once('time.lib.php');
 		// the ; is important as it is used as a delimiter to calculate stuff later on
 		newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle'  + parent + txtStart + '><img height=10px src="images/zaneinthebaththumb.png"></div>';
 		newDivSave = newDivSave + '<span id=' + parent + txtStart + 'display > ' + name + ' Duration: ' + count * 0.25 + '</span>';
-		newDivSave = newDivSave + '<span id=' + parent + txtStart + 'data class=hideData style="visible: hidden">' + name + ';' + start + ';' + end + ';' + count * 0.25 + ';' + count + ';' + parent + '</span>'; 
+		newDivSave = newDivSave + '<span id=' 
+					+ parent + txtStart + 'data class=hideData style="visible: hidden">' + name + ';' + start + ';' 
+					+ end + ';' + count * 0.25 + ';' + count + ';' + parent + ';' 
+					+ inputType + ';' + inputCode+ ';' + inputDetails + '</span>'; 
 		newDivSave = newDivSave + '</div>';	
                     
                     
@@ -450,7 +453,8 @@ require_once('time.lib.php');
 			// get an array of the data that is hidden in the span
 			var spanValues = $(this).text().split(";");
 			
-			var key = spanValues[0];
+			// the job code is set to the 8th element of the span
+			var key = spanValues[7];
 			var value = spanValues[3];
 			
 			// name  and time in hours
@@ -686,28 +690,83 @@ require_once('time.lib.php');
 					else {
 					
 						if (start != ""){
-						
-							var name = prompt("Please enter in the name of the appointment from " + start + " to " + end, "");
-								
-							// going to add the start to the class, and it has problems
-							// seeing : when in the class, so changing it to -
+
+							// clear out any old input divs
+							$("#inputDiv").remove();	
+							
+							var newInputDiv = '<div id="inputDiv" style="position:absolute; top:55; left:44;">' + 
+							' <table bgcolor="#0000FF"> ' + 
+							' <tr><td id=inputDivTitle color="#FFFFFF">Details</td></tr> ' + 
+							' <tr><td bgcolor="#8888FF">Name:</td><td> <input id=inputName type=text> </td></tr> ' + 
+							' <tr><td bgcolor="#8888FF">Type:</td><td> <input id=inputType type=text> </td></tr> ' +
+							' <tr><td bgcolor="#8888FF">Job:</td><td> <input id=inputCode type=text> </td></tr> ' +
+							' <tr><td bgcolor="#8888FF">Details:</td><td> <textarea id=inputDetails></textarea> </td></tr> ' +
+							' <tr><td colspan=2 bgcolor="#8888FF"><input type=submit id=inputSubmit value=Submit ><input type=submit id=cancelSubmit value=Cancel </td></tr> ' +
+							' </table></div> ';
+							
+							$('#overCalendar').append(newInputDiv);
+			    			
+							$('#inputDiv :input:visible:enabled').keyup(function(e) {
+
+								if(e.keyCode == 27) {
+									$('#cancelSubmit').click();
+								}
+
+							
+								//alert(e.keyCode);
+								if(e.keyCode == 13) {
+									$('#inputSubmit').click();
+								}
+							});
+										
+							var topOffset  = e.pageY  - 100; 
+							var leftOffset = e.pageX + 18 ; 
+							
+							$('#inputDivTitle').text('Add new appointment');
+
+							$("#inputDiv").show().css("width","500px")
+							.css("top",topOffset).css("left",leftOffset);
 														
-							if (name != null && name != ""){  							
+							$('#cancelSubmit').click(function(){
+								$("#inputDiv").hide();	
+							});
+							
+							// get the focus on the first text area
+							$("#inputDiv :input:visible:enabled:first").focus();
+							
+							
+							$('#inputSubmit').click(function(){
+								$("#inputDiv").hide();	
 								
-								setSelectedElementsToSave (collection,name);								
+
+								// var name = prompt("Please enter in the name of the appointment", "");
+								var name = $('#inputName').val(); 	
+									
 								
-							                	
-							} // end of if name != ""	
-							else {
-								// if no name then 
-								// reset all the selections
-    			                collection.each(function() {
-        	    	    	    	
-            	    	    		$(this).removeClass('ui-selected');
-           					
-                	    		});						
-								
-							}
+								// going to add the start to the class, and it has problems
+								// seeing : when in the class, so changing it to -
+															
+								if (name != null && name != ""){  							
+									
+									
+									collection = jQuery('li.ui-selected:visible');
+									setSelectedElementsToSave (collection,name,$('#inputType').val(),$('#inputCode').val(),$('#inputDetails').val() );								
+									
+								                	
+								} // end of if name != ""	
+								else {
+									// if no name then 
+									// reset all the selections
+	    			                collection.each(function() {
+	        	    	    	    	
+	            	    	    		$(this).removeClass('ui-selected');
+	           					
+	                	    		});						
+									
+								}								
+							})
+							
+						
 														
 								
 						} // end of start !+ "" 
@@ -746,6 +805,9 @@ require_once('time.lib.php');
 		        var parent = spanValues[5];
 		        var start = spanValues[1];	  
 		        var oldName = spanValues[0];      
+		        var oldType = spanValues[6];
+		        var oldCode = spanValues[7];
+		        var oldDetails = spanValues[8];
 		        var txtStart = start.replace(/:/,"-");
 		        
 		        if ($(this).hasClass('saved') && 
@@ -769,7 +831,7 @@ require_once('time.lib.php');
 						
 						collection = jQuery('li.moved:visible');
 						
-						setSelectedElementsToSave (collection,oldName);	
+						setSelectedElementsToSave (collection,oldName,oldType,oldCode,oldDetails);	
 						
 						// delete the old details
 						// deleteOldElements(
@@ -852,7 +914,7 @@ require_once('time.lib.php');
 								// convert all addClass('moved') to be a new div								
 								collection = jQuery('li.moved:visible');
 								
-								setSelectedElementsToSave (collection,oldName);	
+								setSelectedElementsToSave (collection,oldName,oldType,oldCode,oldDetails);
 								
 
 								
