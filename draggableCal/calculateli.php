@@ -85,6 +85,205 @@ require_once('time.lib.php');
 			grid: 	[102,1]
 				    
 		})
+		.resizable({
+			handles: "s",
+			transparent: true,
+			helper: "proxy",
+			grid: [0,3],
+			stop: function(ev, ui){
+
+					
+					/* Two scenarios
+					
+						expanding from 30 minutes starting at 09-00 to 1 hour from 09-00 to 09-45 inclusive
+						
+						li's and their classes 
+						
+								current 		resize				final
+						09-00	save 09-00		save 09-00 resize	save 09-00	
+						09-15	save 09-00		save 09-00 resize	save 09-00
+						09-30					resize 				save 09-00
+						09-45					resize 				save 09-00
+						10-00
+						
+						shrinking
+
+						reducing from 1 hour starting at 09-00 to 15 minutes at 09-00
+						
+						li's and their classes 
+						
+								current 		resize				final
+						09-00	save 09-00		save 09-00 resize	save 09-00	
+						09-15	save 09-00		save 09-00 	
+						09-30	save 09-00		save 09-00 		
+						09-45	save 09-00		save 09-00 		
+						10-00
+						
+						
+						PROBLEM when resizing to down to 1 element,
+						have to reset the droppable handle div and background color
+											
+					*/
+					
+					// get the height of the expanded element ui.element.height()
+					// get the height of the original element ui.originalSize.height
+					// then round it based on the height of the li's (in this case it's 15
+					// eg. if the old height was 30 then it would be two columns
+					// if the new height is 60 then it is 4 columns (or count of 4)					
+					var diffHeight = parseFloat(ui.element.height()) - parseFloat(ui.originalSize.height);
+					var diffCount = diffHeight / 15;
+					var diffRoundCount = Math.round(diffCount) ; // 15 is the height of the li's and rounds it
+					
+					
+
+					
+										
+					// then we have to go through the all the current li elements (if the count is -ve) 
+					// extra li elements eg. extra 2 columns in this example
+					// and check that they are not set as saved
+					// set the class to be "resized" for all elements, including the current elements (in case they shrink the element)
+					// just to keep track and also set the start date as a class
+					// need to keep count of how many extra elements have been processed so far
+
+
+					// collect the current elements but have to find the parent and the start date
+					 
+					// find the data hidden in the span of the div
+					// eg. timeslotsWednesday09-00
+					var spanName = ui.element.attr('id') + 'data';  		
+				  		
+				  		 
+					// get an array of the data that is hidden in the span
+					var spanText = $('#' + spanName).text();
+					
+					var spanValues = spanText.split(";");
+					
+					var start = spanValues[1];
+					var oldCount = spanValues[4];
+					var parent = spanValues[5];
+					 
+					var txtStart = start.replace(/:/,"-");
+					var newEnd = '';
+					var newCount = diffRoundCount + parseFloat(oldCount);
+					
+					// now setup the query for current (ie before the resize) li elements
+					// only if the count is < 0
+					// eg. #timeslotsWednesday > li.09-00
+					
+					var query = "#" + parent + ' > li.'+ txtStart;
+					collectionCurrent = jQuery(query);					
+					
+					// if diffRoundCount < 0
+					if (diffRoundCount < 0){					
+	
+						// for each collection Current, only do this if the count is -ve
+						// that means we are shrinking. note i is a counter
+						collectionCurrent.each(function (i){
+							
+							// get elements count eg. 4 and then add the -ve count eg. -3 then 
+							// you will get the number of elements to traverse to add the class 'resize'
+							// eg. updated count = 1
+							
+							//$("#textPopup").text('hello');
+							//$("#hoverPopup").show();
+
+							
+
+							if (i == (newCount -1)){
+								newEnd = $(this).text();
+							}
+
+							// check if the updated count is over the current count
+							if ( i > (newCount -1)){ 
+							
+								//$(this).text('in here');
+								// then remove the saved class and the txtStart class for all elements from here on in
+								$(this).removeClass('saved').removeClass(txtStart).css("background","").css("color","").css("border-bottom","").css("height","");
+								 
+								 
+								
+						 	}
+						});						
+					
+						
+					
+						if (newCount == 1){
+							// also reset the draggable handle of the div etc if count = 1
+							
+							
+						}
+					
+					
+					} // end if diffRoundCount < 0
+					// else of diffRoundCount < 0 - so adding li's
+					else {
+					
+						// find the last collectionCurrent
+						
+						
+
+	
+						// for each collection Current, only do this if the count is -ve
+						// that means we are shrinking. note i is a counter
+						collectionCurrent.eq(parseFloat(oldCount) - 1).nextAll()
+				        .each(function (i){
+				        	
+				        	$('#overCalendar').append(i + '::' + diffRoundCount +  '::' + $(this).text() + '<br>');
+				        	
+				        });
+				        
+ 						
+						
+ 						
+				
+					} // end else
+					
+					// once the number have been reached, at the end of the loop
+					// if they are all ok, then set all the class of resized to be saved
+					// have to change the count for the div element and also the end date and the duration
+					 	
+					// delete any saved elements for this event that have not been set a class of resized
+										
+					// now reset the div stuff
+					// have to change the 
+					// - count for the div element
+					spanValues[4] = newCount;
+					 
+					// -  the end date
+					spanValues[2] = newEnd; 
+					
+					// -  the duration
+					spanValues[3] = 0.25 * newCount;
+					
+					
+					// - the height of the div
+					var newHeight = (newCount * 15) - 2; // the 2px is for the border at the bottom 
+					ui.element.height(newHeight + 'px');
+					
+					/* ui.element					
+					var spanName = ui.element.attr('id') + 'data';
+					*/  		
+					$('#' + spanName).text(spanValues[0] + ';' + spanValues[1] + ';' + spanValues[2] + ';' + spanValues[3] + ';' + spanValues[4] + ';' + spanValues[5]);					
+					var newHTML = ui.element.html();
+					
+					
+					var oldDuration = oldCount * 0.25;
+					
+					newHTML = newHTML.replace('Duration: ' + oldDuration + '<span','Duration: ' + spanValues[3] + '<span' );
+					
+					ui.element.html(newHTML);
+					
+					
+					 
+					
+							
+			
+			} // function for stop
+			
+			
+			
+
+		})
 		// set to delete if double clicked
 		.dblclick(function () { 
 		
@@ -621,6 +820,12 @@ if(strpos($user_agent, 'MSIE') !== false)
 	echo "li {margin-top:-1px;}";
 }
 ?>
+</style>
+<style> 
+.proxy {
+		
+		border: 1px dashed red;
+}
 </style>
 
 
