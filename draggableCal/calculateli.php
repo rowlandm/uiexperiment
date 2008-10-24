@@ -15,6 +15,86 @@ require_once('time.lib.php');
 <script type="text/javascript" src="json.js"></script> 
 <script>
   	
+  	function refreshCalendar(){
+        
+        // remove divs with class of savedDiv and then remove the li.saved items to refresh
+        $('#overCalendar > div').filter('.savedDiv').remove();
+        
+        $('#overCalendar > li').filter('.saved').removeClass().addClass('ui-selectee').addClass('ui-droppable')
+        .css("background","").css("color","").css("border-bottom","").css("height","");
+        
+        
+        
+        // want to return the monday date so that we can populate the entire week
+        // $('ul[id*="timeslotsMonday"]') says get all ul's that have an id that contains timeSlotsMonday
+        // .attr(id) gets the actual id eg. timeslotsMonday20-10-2008
+        // split puts it into an array with day as the delimiter. so mondayDate[1] should have the date for the monday
+        var mondayDate = $('ul[id*="timeslotsMonday"]').attr('id').split('day');
+        
+        var postData = 'action=retrieve&username='+ $('#userNameInput').val() + '&mondayDate=' + mondayDate[1];  
+        
+        // initialise the calendar
+		// call ajax from the database to return the records and use them to create events
+  		$.ajax({
+			type: "POST",
+		   	url: "ajaxcal.php",
+		   	data: postData,
+		   	success: function(msg){
+		   		// debug code
+		   		// $('#overCalendar > span:last').remove();
+		    	// $('#overCalendar').append('<span>'  + msg + '</span>');
+		    	
+		    	
+ 		    	var myObject = json_parse(msg);
+ 		    	$('#overCalendar').append('<span>');
+				for (key in myObject){
+					
+					
+					
+					// myObject[key].htmlid is timeslotsFriday24-10-200809:30
+					// we want to get the parent which would be timeslotsFriday24-10-2008
+					// so take off the last 5 chars
+					
+					var parent = myObject[key].htmlid.substr(0,myObject[key].htmlid.length - 5);
+					
+					// appt_start is format 2008-10-20 13:15:00
+					var start = myObject[key].appt_start.substr(11,5);
+					var end = myObject[key].appt_end.substr(11,5);
+
+					
+					
+					// mark all the appropriate li's as class 'ui-selected'
+					$('#'+ parent + ' > li:contains("' + start + '")').addClass('ui-selected')
+					.nextAll().each(function (i){
+					
+						$(this).addClass('ui-selected');
+						if ($(this).text() == end){
+							return false;
+						}
+					
+					});
+				
+					// now just do a collection for this object and call the details
+					
+					var collection = jQuery('li.ui-selected:visible');
+					var name = myObject[key].appt_name;
+					var inputType = myObject[key].appt_type;
+					var inputCode = myObject[key].appt_code;
+					var inputDetails = myObject[key].appt_details;
+					setSelectedElementsToSave ('retrieved',collection,name,inputType,inputCode,inputDetails);								
+					
+				}	
+
+				
+				
+				
+				
+		    	
+		   	}
+		});
+		
+		  	
+  	}
   	
   	function editSavedDiv (el,pos){
 		
@@ -358,10 +438,17 @@ require_once('time.lib.php');
 					{
 						
 						$('#' + parent + txtStart).css("background","green");
+						
+						if ($('#refreshDiv > :radio:checked').val() == 'on'){
+							refreshCalendar();
+						}
 					}
 			    	
 			   	}
 			});					
+			
+			
+					
 		
 		} //end of if saved 
 		else {
@@ -591,10 +678,15 @@ require_once('time.lib.php');
 					{
 						
 						$('#' + parent + txtStart).css("background","green");
+						if ($('#refreshDiv > :radio:checked').val() == 'on'){
+							refreshCalendar();
+						}
 					}
 			    	
 			   	}
 			});
+			
+			
 		}// if action move or add
 		else { // usually action of retrieved - already in teh database so make it green
 			$('#' + parent + txtStart).css("background","green");
@@ -771,6 +863,9 @@ require_once('time.lib.php');
 			   		// $('#overCalendar > span:last').remove();
 			    	// $('#overCalendar').append('<span>'  + msg + '::' + parent + txtStart + '</span>');
 			    	
+			      	if ($('#refreshDiv > :radio:checked').val() == 'on'){
+						refreshCalendar();
+					}
 			      	
 			      	var pos = msg.indexOf("SUCCESS");
 					if (pos >= 0)
@@ -782,6 +877,7 @@ require_once('time.lib.php');
 			   	}
 			});
 
+			
 			  			
   			
   			
@@ -801,76 +897,16 @@ require_once('time.lib.php');
 		$("#hoverPopup").hide();
 		
         var collection;
-        
-        // want to return the monday date so that we can populate the entire week
-        // $('ul[id*="timeslotsMonday"]') says get all ul's that have an id that contains timeSlotsMonday
-        // .attr(id) gets the actual id eg. timeslotsMonday20-10-2008
-        // split puts it into an array with day as the delimiter. so mondayDate[1] should have the date for the monday
-        var mondayDate = $('ul[id*="timeslotsMonday"]').attr('id').split('day');
-        
-        var postData = 'action=retrieve&username='+ $('#userNameInput').val() + '&mondayDate=' + mondayDate[1];  
-        
-        // initialise the calendar
-		// call ajax from the database to return the records and use them to create events
-  		$.ajax({
-			type: "POST",
-		   	url: "ajaxcal.php",
-		   	data: postData,
-		   	success: function(msg){
-		   		// debug code
-		   		// $('#overCalendar > span:last').remove();
-		    	// $('#overCalendar').append('<span>'  + msg + '</span>');
-		    	
-		    	
- 		    	var myObject = json_parse(msg);
- 		    	$('#overCalendar').append('<span>');
-				for (key in myObject){
-					
-					
-					
-					// myObject[key].htmlid is timeslotsFriday24-10-200809:30
-					// we want to get the parent which would be timeslotsFriday24-10-2008
-					// so take off the last 5 chars
-					
-					var parent = myObject[key].htmlid.substr(0,myObject[key].htmlid.length - 5);
-					
-					// appt_start is format 2008-10-20 13:15:00
-					var start = myObject[key].appt_start.substr(11,5);
-					var end = myObject[key].appt_end.substr(11,5);
 
-					
-					
-					// mark all the appropriate li's as class 'ui-selected'
-					$('#'+ parent + ' > li:contains("' + start + '")').addClass('ui-selected')
-					.nextAll().each(function (i){
-					
-						$(this).addClass('ui-selected');
-						if ($(this).text() == end){
-							return false;
-						}
-					
-					});
-				
-					// now just do a collection for this object and call the details
-					
-					var collection = jQuery('li.ui-selected:visible');
-					var name = myObject[key].appt_name;
-					var inputType = myObject[key].appt_type;
-					var inputCode = myObject[key].appt_code;
-					var inputDetails = myObject[key].appt_details;
-					setSelectedElementsToSave ('retrieved',collection,name,inputType,inputCode,inputDetails);								
-					
-				}	
+		// radio button to turn refresh on and off when submitting data for events
+		newRadioHTML = '<div id=refreshDiv><br>Refresh after every action? <br><input type="radio"  name="refreshRadio" value="on"> ON '  
+					+  '<input type="radio"  name="refreshRadio" value="off" checked> OFF <br></div>';
+		$('#overCalendar').prepend(newRadioHTML);
+		
+		//alert($('#refreshDiv > :radio:checked').val());
 
-				
-				
-				
-				
-		    	
-		   	}
-		});
-		
-		
+		// initial refresh
+		refreshCalendar();
 		
 		
          
