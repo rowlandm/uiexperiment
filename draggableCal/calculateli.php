@@ -8,11 +8,12 @@ require_once('time.lib.php');
                     "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-  	<script src="jquery-1.2.6.js"></script>
-	<script src="jquery-ui-personalized-1.6rc2.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="jquery.contextMenu.css" /> 
-  	<script type="text/javascript" src="jquery.contextMenu.js"></script>
-  	<script>
+<script src="jquery-1.2.6.js"></script>
+<script src="jquery-ui-personalized-1.6rc2.min.js"></script>
+<link rel="stylesheet" type="text/css" href="jquery.contextMenu.css" />
+<script type="text/javascript" src="jquery.contextMenu.js"></script>
+<!--  <script type="text/javascript" src="json.js"></script> -->
+<script>
   	
   	
   	function editSavedDiv (el,pos){
@@ -735,7 +736,35 @@ require_once('time.lib.php');
 		$("#hoverPopup").hide();
 		
         var collection;
-          
+        
+        // want to return the monday date so that we can populate the entire week
+        // $('ul[id*="timeslotsMonday"]') says get all ul's that have an id that contains timeSlotsMonday
+        // .attr(id) gets the actual id eg. timeslotsMonday20-10-2008
+        // split puts it into an array with day as the delimiter. so mondayDate[1] should have the date for the monday
+        var mondayDate = $('ul[id*="timeslotsMonday"]').attr('id').split('day');
+        
+        var postData = 'action=retrieve&username='+ $('#userNameInput').val() + '&mondayDate=' + mondayDate[1];  
+        
+		// call ajax from the database to return the records and use them to create events
+  		$.ajax({
+			type: "POST",
+		   	url: "ajaxcal.php",
+		   	data: postData,
+		   	success: function(msg){
+		   		$('#overCalendar > span:last').remove();
+		    	$('#overCalendar').append('<span>'  + msg + '</span>');
+		    	
+		    	
+// 		    	var myObject = json_parse(msg);
+				
+		    	
+		   	}
+		});
+		
+		
+		
+		
+         
         
           
         // This is to set all ul tags that are in the overCalendar DIV to be selectable - includes li tags too
@@ -1087,27 +1116,54 @@ require_once('time.lib.php');
 
 
 <style>
-ul { list-style: none; margin:0px; padding:0px;}
-.ui-selected { background: #black; color: #FFF; border-bottom: 2px solid #727EA3;}
-.ui-selecting { background: #CFD499; } 
+ul {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+}
 
-.savedDiv {background: orange; position:absolute; font-size: 9px; width: 100px; }
+.ui-selected {
+	background: #black;
+	color: #FFF;
+	border-bottom: 2px solid #727EA3;
+}
 
+.ui-selecting {
+	background: #CFD499;
+}
 
-li {border-bottom: 2px solid black;background: #CFD4E6; height:10px; width: 100px; margin-top:0px; font-size: 9px; font-family: Arial; padding-top: 3px; }
+.savedDiv {
+	background: orange;
+	position: absolute;
+	font-size: 9px;
+	width: 100px;
+}
+
+li {
+	border-bottom: 2px solid black;
+	background: #CFD4E6;
+	height: 10px;
+	width: 100px;
+	margin-top: 0px;
+	font-size: 9px;
+	font-family: Arial;
+	padding-top: 3px;
+}
+
 <?php
-//Detect if user's browser is IE, if so, include IE hack to improve CSS Standards compliency
-$user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
-if(strpos($user_agent, 'MSIE') !== false)
-{
-	echo "li {margin-top:-1px;}";
+ //Detect if user 's browser is IE,if so,include IE hack to improve CSS Standards compliency
+ $user_agent  = isset ($_SERVER[ 'HTTP_USER_AGENT '] )  ? $_SERVER[ 'HTTP_USER_AGENT
+	']  : ''; if (strpos($user_agent, 'MSIE ')  !== false ) {echo "li
+	{margin-top:-1px;
+	
+}
+";
 }
 ?>
 </style>
-<style> 
+<style>
 .proxy {
-		
-		border: 1px dashed red;
+	border: 1px dashed red;
 }
 </style>
 
@@ -1116,209 +1172,211 @@ if(strpos($user_agent, 'MSIE') !== false)
 <body>
 
 
-<div id=userName>
+<div id=userName><select id=userNameInput>
 
-	
-	<select  id=userNameInput>
-	
-		<option value=rowland.mosbergen>rowland.mosbergen</option>
-		<!--   <option value=corey.evans>corey.evans</option> -->
-		
-	</select>
-	
+	<option value=rowland.mosbergen>rowland.mosbergen</option>
+	<!--   <option value=corey.evans>corey.evans</option> -->
 
-</div>
+</select></div>
 
-<div id=overCalendar>
+<div id=overCalendar><?php
 
-	<?php
-	
-	$dateToday = getdate();
-	
-	// echo $dateToday[weekday] . '::' . $dateToday[mday] . '::' . $dateToday[wday];
-	
-	$daysFromMonday = $dateToday[wday] -1;
-	
-	$date = new DateTime();
-	$date->modify("-" . $daysFromMonday . "day");
-	
-	
-	?>
+$dateToday = getdate();
+
+// echo $dateToday[weekday] . '::' . $dateToday[mday] . '::' . $dateToday[wday];
+
+$daysFromMonday = $dateToday[wday] -1;
+
+$date = new DateTime();
+$date->modify("-" . $daysFromMonday . "day");
+
+
+?>
 
 <table CELLSPACING=0>
-	<tr><td>
+	<tr>
+		<td></td>
+		<td><?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+
+		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
+		<?php
+
+		$start = "05:45";
+		$end = "17:30";
+		$slots = "15";
+		$format = "24";
+
+		$nBlocked=0;
+		$timeslotArray = timeslotArray($start,$end,$slots,$format);
+		foreach($timeslotArray as $value){
+			if(in_array($value, $blockedArray)){
+				$nBlocked++;
+				?>
+
+			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
+
+			<?php
+			}else{
+				?>
+			<li><?php echo $value;?></li>
+			<?php
+			}
+		}
+		?>
+		</ul>
+		</td>
+		<td><?php 
+		$date->modify("+1 day");
+
+		?> <?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
 
 
-	</td>
-	<td>
-	<?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-	
-	<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-	<?php
-	
-	$start = "05:45";
-	$end = "17:30";
-	$slots = "15";
-	$format = "24";
-	
-	$nBlocked=0;
-	$timeslotArray = timeslotArray($start,$end,$slots,$format);
-	foreach($timeslotArray as $value){
-		if(in_array($value, $blockedArray)){
-		$nBlocked++;
-	?>
-		
-		<li class=saved style='background:black;color:white;'><?php echo $value;?></li>
-		
-	<?php
-		}else{
-	?>
-			<li><?php echo $value;?></li>
-	<?php
-		}
-	}
-	?>
-	</ul>
-	</td>
-	<td>
+		<?php
+		$nBlocked=0;
+		$timeslotArray = timeslotArray($start,$end,$slots,$format);
+		foreach($timeslotArray as $value){
+			if(in_array($value, $blockedArray)){
+				$nBlocked++;
+				?>
 
-	<?php 
-	$date->modify("+1 day");
-	
-	?>
-	<?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-	<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-	
+			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
 
-	<?php
-	$nBlocked=0;
-	$timeslotArray = timeslotArray($start,$end,$slots,$format);
-	foreach($timeslotArray as $value){
-		if(in_array($value, $blockedArray)){
-		$nBlocked++;
-	?>
-		
-		<li class=saved style='background:black;color:white;'><?php echo $value;?></li>
-		
-	<?php
-		}else{
-	?>
+			<?php
+			}else{
+				?>
 			<li><?php echo $value;?></li>
-	<?php
+			<?php
+			}
 		}
-	}
-	?>
-	</ul>	
-	</td>
-	<td>
-	<?php 
-	$date->modify("+1 day");
-	
-	?>
-	<?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-	<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
+		?>
+		</ul>
+		</td>
+		<td><?php 
+		$date->modify("+1 day");
+
+		?> <?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
 
 
-	<?php
-	$nBlocked=0;
-	$timeslotArray = timeslotArray($start,$end,$slots,$format);
-	foreach($timeslotArray as $value){
-		if(in_array($value, $blockedArray)){
-		$nBlocked++;
-	?>
-		
-		<li class=saved style='background:black;color:white;'><?php echo $value;?></li>
-		
-	<?php
-		}else{
-	?>
+		<?php
+		$nBlocked=0;
+		$timeslotArray = timeslotArray($start,$end,$slots,$format);
+		foreach($timeslotArray as $value){
+			if(in_array($value, $blockedArray)){
+				$nBlocked++;
+				?>
+
+			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
+
+			<?php
+			}else{
+				?>
 			<li><?php echo $value;?></li>
-	<?php
+			<?php
+			}
 		}
-	}
-	?>
-	</ul>	
-	</td>
-	<td>
-	<?php 
-	$date->modify("+1 day");
-	
-	?>
-	<?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-	<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-	<?php
-	$nBlocked=0;
-	$timeslotArray = timeslotArray($start,$end,$slots,$format);
-	foreach($timeslotArray as $value){
-		if(in_array($value, $blockedArray)){
-		$nBlocked++;
-	?>
-		
-		<li class=saved style='background:black;color:white;'><?php echo $value;?></li>
-		
-	<?php
-		}else{
-	?>
+		?>
+		</ul>
+		</td>
+		<td><?php 
+		$date->modify("+1 day");
+
+		?> <?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
+		<?php
+		$nBlocked=0;
+		$timeslotArray = timeslotArray($start,$end,$slots,$format);
+		foreach($timeslotArray as $value){
+			if(in_array($value, $blockedArray)){
+				$nBlocked++;
+				?>
+
+			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
+
+			<?php
+			}else{
+				?>
 			<li><?php echo $value;?></li>
-	<?php
+			<?php
+			}
 		}
-	}
-	?>
-	</ul>	
-	</td>
-	<td>
-	<?php 
-	$date->modify("+1 day");
-	
-	?>
-	<?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-	<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-	<?php
-	$nBlocked=0;
-	$timeslotArray = timeslotArray($start,$end,$slots,$format);
-	foreach($timeslotArray as $value){
-		if(in_array($value, $blockedArray)){
-		$nBlocked++;
-	?>
-		
-		<li class=saved style='background:black;color:white;'><?php echo $value;?></li>
-		
-	<?php
-		}else{
-	?>
+		?>
+		</ul>
+		</td>
+		<td><?php 
+		$date->modify("+1 day");
+
+		?> <?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
+		<?php
+		$nBlocked=0;
+		$timeslotArray = timeslotArray($start,$end,$slots,$format);
+		foreach($timeslotArray as $value){
+			if(in_array($value, $blockedArray)){
+				$nBlocked++;
+				?>
+
+			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
+
+			<?php
+			}else{
+				?>
 			<li><?php echo $value;?></li>
-	<?php
+			<?php
+			}
 		}
-	}
-	?>
-	</ul>	
-	</td>
-	<td>
-	<?php 
-	$date->modify("+1 day");
-	?>
-	<?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-	<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-	<?php
-	$nBlocked=0;
-	$timeslotArray = timeslotArray($start,$end,$slots,$format);
-	foreach($timeslotArray as $value){
-		if(in_array($value, $blockedArray)){
-		$nBlocked++;
-	?>
-		
-		<li class=saved style='background:black;color:white;'><?php echo $value;?></li>
-		
-	<?php
-		}else{
-	?>
+		?>
+		</ul>
+		</td>
+		<td><?php 
+		$date->modify("+1 day");
+		?> <?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
+		<?php
+		$nBlocked=0;
+		$timeslotArray = timeslotArray($start,$end,$slots,$format);
+		foreach($timeslotArray as $value){
+			if(in_array($value, $blockedArray)){
+				$nBlocked++;
+				?>
+
+			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
+
+			<?php
+			}else{
+				?>
 			<li><?php echo $value;?></li>
-	<?php
+			<?php
+			}
 		}
-	}
-	?>
-	</ul>	
-	</td>				
+		?>
+		</ul>
+		</td>
+		<td><?php 
+		$date->modify("+1 day");
+		?> <?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
+		<?php
+		$nBlocked=0;
+		$timeslotArray = timeslotArray($start,$end,$slots,$format);
+		foreach($timeslotArray as $value){
+			if(in_array($value, $blockedArray)){
+				$nBlocked++;
+				?>
+
+			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
+
+			<?php
+			}else{
+				?>
+			<li><?php echo $value;?></li>
+			<?php
+			}
+		}
+		?>
+		</ul>
+		</td>
 	</tr>
 </table>
 
@@ -1328,31 +1386,25 @@ if(strpos($user_agent, 'MSIE') !== false)
 
 
 <ul id="savedDivMenu" class="contextMenu">
-    <li class="showDetails">
-        <a href="#showDetails">Show Details</a>
-    </li>
-    <li class="dailyTotals">
-        <a href="#dailyTotals">Daily Totals</a>
-    </li>    
-    <li class="weeklyTotals">
-        <a href="#weeklyTotals">Weekly Totals</a>
-    </li>    
-    <li class="edit">
-        <a href="#edit">Edit</a>
-    </li>
-    
-    <li class="delete">
-        <a href="#delete">Delete</a>
-    </li>
-    <li class="quit separator">
-        <a href="#quit">Quit</a>
-    </li>
+	<li class="showDetails"><a href="#showDetails">Show Details</a></li>
+	<li class="dailyTotals"><a href="#dailyTotals">Daily Totals</a></li>
+	<li class="weeklyTotals"><a href="#weeklyTotals">Weekly Totals</a></li>
+	<li class="edit"><a href="#edit">Edit</a></li>
+
+	<li class="delete"><a href="#delete">Delete</a></li>
+	<li class="quit separator"><a href="#quit">Quit</a></li>
 </ul>
 
-<div id="hoverPopup" style=" position:absolute; top:55; left:44;">
+<div id="hoverPopup" style="position: absolute; top: 55; left: 44;">
 <table bgcolor="#0000FF">
-<tr><td id=titlePopup color="#FFFFFF">Details</td></tr>
-<tr><td id=textPopup bgcolor="#8888FF">Hello I am a popup table</td></tr></table></div>
+	<tr>
+		<td id=titlePopup color="#FFFFFF">Details</td>
+	</tr>
+	<tr>
+		<td id=textPopup bgcolor="#8888FF">Hello I am a popup table</td>
+	</tr>
+</table>
+</div>
 
 
 </body>
