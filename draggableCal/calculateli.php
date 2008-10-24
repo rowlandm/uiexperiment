@@ -342,7 +342,7 @@ require_once('time.lib.php');
 		$("* > .resized").removeClass('resized');
 	} //  stopResizing	
   	
-  	function setSelectedElementsToSave (collection,name,inputType,inputCode,inputDetails){
+  	function setSelectedElementsToSave (action,collection,name,inputType,inputCode,inputDetails){
   		
   		
   		name = name.replace(";",",");
@@ -529,37 +529,41 @@ require_once('time.lib.php');
 		});
   	
   		// now save this into the database
-  		// $('#userNameInput').?
-		/*
-		name + ';' + start + ';' 
-					+ end + ';' + count * 0.25 + ';' + count + ';' + parent + ';' 
-					+ inputType + ';' + inputCode+ ';' + inputDetails 
-		*/
+  		
 		
 		
-		var postData = 'username=' + $('#userNameInput').val() + '&name=' + name + '&start=' + start + '&end=' + end + '&htmlID=' + parent + start  + '&inputType=' + inputType
+		var postData = 'username=' + $('#userNameInput').val() + '&name=' + name + '&start=' + start + '&end=' + end + '&htmlID=' + parent + txtStart  + '&inputType=' + inputType
 		+ '&inputCode=' + inputCode + '&inputDetails=' + inputDetails + '&action=add';
 		
 
+		// only send the ajax if 'action' is a move or an add
 		
-  		$.ajax({
-			type: "POST",
-		   	url: "ajaxcal.php",
-		   	data: postData,
-		   	success: function(msg){
-		   		$('#overCalendar > span:last').remove();
-		    	$('#overCalendar').append('<span>'  + msg + '::' + parent + start + '</span>');
-		    	
-		      	
-		      	var pos = msg.indexOf("SUCCESS");
-				if (pos >= 0)
-				{
-					
-					$('#' + parent + txtStart).css("background","green");
-				}
-		    	
-		   	}
-		});
+		if ((action == 'moved') || (action == 'add')){
+		
+	  		$.ajax({
+				type: "POST",
+			   	url: "ajaxcal.php",
+			   	data: postData,
+			   	success: function(msg){
+			   		
+			   		// debug code
+			   		// $('#overCalendar > span:last').remove();
+			    	// $('#overCalendar').append('<span>'  + msg + '::' + parent + start + '</span>');
+			    	
+			      	
+			      	var pos = msg.indexOf("SUCCESS");
+					if (pos >= 0)
+					{
+						
+						$('#' + parent + txtStart).css("background","green");
+					}
+			    	
+			   	}
+			});
+		}// if action move or add
+		else { // usually action of retrieved - already in teh database so make it green
+			$('#' + parent + txtStart).css("background","green");
+		}
   	
   	}
   	
@@ -717,6 +721,32 @@ require_once('time.lib.php');
   			// note the div id is the parent + the start 
   			// eg. id=timeslotsMonday07-15 
   			$("#" + parent + txtStart).remove();
+
+			var postData = 'username=' + $('#userNameInput').val() + '&htmlID=' + parent + txtStart  + '&action=delete';
+
+			
+
+	  		$.ajax({
+				type: "POST",
+			   	url: "ajaxcal.php",
+			   	data: postData,
+			   	success: function(msg){
+			   		
+			   		// debug code
+			   		// $('#overCalendar > span:last').remove();
+			    	// $('#overCalendar').append('<span>'  + msg + '::' + parent + txtStart + '</span>');
+			    	
+			      	
+			      	var pos = msg.indexOf("SUCCESS");
+					if (pos >= 0)
+					{
+						
+						
+					}
+			    	
+			   	}
+			});
+
 			  			
   			
   			
@@ -745,19 +775,63 @@ require_once('time.lib.php');
         
         var postData = 'action=retrieve&username='+ $('#userNameInput').val() + '&mondayDate=' + mondayDate[1];  
         
+        // initialise the calendar
 		// call ajax from the database to return the records and use them to create events
   		$.ajax({
 			type: "POST",
 		   	url: "ajaxcal.php",
 		   	data: postData,
 		   	success: function(msg){
-		   		$('#overCalendar > span:last').remove();
-		    	$('#overCalendar').append('<span>'  + msg + '</span>');
+		   		// debug code
+		   		// $('#overCalendar > span:last').remove();
+		    	// $('#overCalendar').append('<span>'  + msg + '</span>');
 		    	
 		    	
  		    	var myObject = json_parse(msg);
+ 		    	$('#overCalendar').append('<span>');
+				for (key in myObject){
+					
+					
+					
+					// myObject[key].htmlid is timeslotsFriday24-10-200809:30
+					// we want to get the parent which would be timeslotsFriday24-10-2008
+					// so take off the last 5 chars
+					
+					var parent = myObject[key].htmlid.substr(0,myObject[key].htmlid.length - 5);
+					
+					// appt_start is format 2008-10-20 13:15:00
+					var start = myObject[key].appt_start.substr(11,5);
+					var end = myObject[key].appt_end.substr(11,5);
+
+					
+					
+					// mark all the appropriate li's as class 'ui-selected'
+					$('#'+ parent + ' > li:contains("' + start + '")').addClass('ui-selected')
+					.nextAll().each(function (i){
+					
+						$(this).addClass('ui-selected');
+						if ($(this).text() == end){
+							return false;
+						}
+					
+					});
 				
-		    	alert(myObject[0].appt_name);
+					// now just do a collection for this object and call the details
+					
+					var collection = jQuery('li.ui-selected:visible');
+					var name = myObject[key].appt_name;
+					var inputType = myObject[key].appt_type;
+					var inputCode = myObject[key].appt_code;
+					var inputDetails = myObject[key].appt_details;
+					setSelectedElementsToSave ('retrieved',collection,name,inputType,inputCode,inputDetails);								
+					
+				}	
+
+				
+				
+				
+				
+		    	
 		   	}
 		});
 		
@@ -923,7 +997,7 @@ require_once('time.lib.php');
 									
 									
 									collection = jQuery('li.ui-selected:visible');
-									setSelectedElementsToSave (collection,name,$('#inputType').val(),$('#inputCode').val(),$('#inputDetails').val() );								
+									setSelectedElementsToSave ('add',collection,name,$('#inputType').val(),$('#inputCode').val(),$('#inputDetails').val() );								
 									
 								                	
 								} // end of if name != ""	
@@ -1004,7 +1078,7 @@ require_once('time.lib.php');
 						
 						collection = jQuery('li.moved:visible');
 						
-						setSelectedElementsToSave (collection,oldName,oldType,oldCode,oldDetails);	
+						setSelectedElementsToSave ('moved',collection,oldName,oldType,oldCode,oldDetails);	
 						
 						// delete the old details
 						// deleteOldElements(
@@ -1087,7 +1161,7 @@ require_once('time.lib.php');
 								// convert all addClass('moved') to be a new div								
 								collection = jQuery('li.moved:visible');
 								
-								setSelectedElementsToSave (collection,oldName,oldType,oldCode,oldDetails);
+								setSelectedElementsToSave ('moved',collection,oldName,oldType,oldCode,oldDetails);
 								
 
 								
