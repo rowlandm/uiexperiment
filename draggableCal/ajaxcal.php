@@ -23,21 +23,7 @@ class appointments extends ADOdb_Active_Record {
     
 }
 
-
-
-
-switch ($action){
-	case "add":
-		
-		
-		$name = $_POST['name'];
-		$start = $_POST['start'];  // format is 09:30
-		$end = $_POST['end']; // format is 10:30
-		$htmlID = $_POST['htmlID']; // format timeslotsThursday23-10-200809:30
-		$inputType = $_POST['inputType'];
-		$inputCode = $_POST['inputCode'];
-		$inputDetails = $_POST['inputDetails'];
-		
+function convertDateTimes($htmlID,$start,$end){
 		// get the date from htmlID eg. timeslotsThursday23-10-200809:30
 		$dateArray = explode('-',$htmlID);
 		
@@ -60,11 +46,30 @@ switch ($action){
 		
 		$setDate = $dateArray[2] . '-' . $dateArray[1] . '-' . $dateArray[0];
 		
-		$start 	= $setDate . ' ' . $start . ':00'; // format 2008-10-23 09:30:00
-		$end 	= $setDate . ' ' . $end . ':00'; // format 2008-10-23 10:30:00
+		$datetimes['start'] = $setDate . ' ' . $start . ':00'; // format 2008-10-23 09:30:00
+		$datetimes['end'] 	= $setDate . ' ' . $end . ':00'; // format 2008-10-23 10:30:00
+			
+		return $datetimes;
+}
+
+
+switch ($action){
+	case "add":
 		
-		// die($start . ' ::' . $end);
 		
+		$name = $_POST['name'];
+		$start = $_POST['start'];  // format is 09:30
+		$end = $_POST['end']; // format is 10:30
+		$htmlID = $_POST['htmlID']; // format timeslotsThursday23-10-200809:30
+		$inputType = $_POST['inputType'];
+		$inputCode = $_POST['inputCode'];
+		$inputDetails = $_POST['inputDetails'];
+		
+		
+		$datetimes = convertDateTimes($htmlID,$start,$end);
+		
+		$start = $datetimes['start'];
+		$end = $datetimes['end'];
 		
 		 
 				
@@ -169,6 +174,57 @@ switch ($action){
 		*/		
 			
 	break;
+	
+	case "delete":
+		
+		
+		$htmlID = $_POST['htmlID']; // format timeslotsThursday23-10-200809:30
+		
+		$deleteQuery = 'DELETE FROM appointments WHERE username = "' . $username . '" AND htmlid = "' . $htmlID . '"';
+		
+		$ok = $DB->Execute($deleteQuery);
+		if (!$ok) {
+			$err = $DB->ErrorMsg();
+			die($err);
+		}	
+		echo 'SUCCESS: deleted successfully.'; 
+	break;
+	
+	case "resize":
+		
+		
+		$htmlID = $_POST['htmlID']; // format timeslotsThursday23-10-200809:30
+		$end = $_POST['end']; // format is 10:30
+		$start = '06:00'; // just need to pass in a dummy, not used
+		
+		$datetimes = convertDateTimes($htmlID,$start,$end);
+		
+		$end = $datetimes['end'];
+		
+		// first check that the resize doesn't go over any other appointments
+		$checkEndDate  = new appointments();
+		
+		$queryCheckEndDate = 'username="' . $username . '" AND appt_start <= "' . $end . '" AND appt_end >= "' . $end . '" AND htmlid <> "' . $htmlID .'"';
+		
+		$checkEndArray = $checkEndDate->Find($queryCheckEndDate);
+		
+		if (count($checkEndArray) > 0){
+			// die("0:" . $queryCheckStartDate. "::" . $queryCheckEndDate ."::" . count($checkStartArray) .'::'. count($checkEndArray) );
+			die("0:Failure to save");
+		}
+		
+		
+		$resizeQuery = 'UPDATE appointments SET appt_end = "'.$end.'" WHERE username = "' . $username . '" AND htmlid = "' . $htmlID . '"';
+		
+		$ok = $DB->Execute($resizeQuery);
+		if (!$ok) {
+			$err = $DB->ErrorMsg();
+			die($err);
+		}	
+		echo 'SUCCESS: resized successfully.'; 
+	break;	
+	
+	
 }
 
 

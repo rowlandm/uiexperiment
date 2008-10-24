@@ -184,6 +184,10 @@ require_once('time.lib.php');
 		
 		var savedClassFound = false;
 		
+		// set the div to be orange again
+		$('#' + parent + txtStart).css("background","");
+		
+		
 		// now setup the query for current (ie before the resize) li elements
 		// only if the count is < 0
 		// eg. #timeslotsWednesday > li.09-00
@@ -209,6 +213,8 @@ require_once('time.lib.php');
 	
 				if (i == (newCount -1)){
 					newEnd = $(this).text();
+									
+					
 				}
 	
 				// check if the updated count is over the current count
@@ -228,6 +234,9 @@ require_once('time.lib.php');
 			if (newCount == 1){
 				// also reset the draggable handle of the div etc if count = 1
 				$("#handle" + parent + txtStart).hide();
+				
+				
+				
 				
 				// FIXME: RHM cannot seem to reset the handle of the draggable element to be the entire element
 			}
@@ -259,9 +268,9 @@ require_once('time.lib.php');
 	        	
 	        	$(this).addClass('resized');
 	        	
-	        	
-	        	
 	        	if (i == (diffRoundCount-1)){
+	        		
+	        		newEnd = $(this).text();
 	        		
 	        		var query = "#" + parent + ' > li.resized';
 					collectionConvertToSaved = jQuery(query);
@@ -327,6 +336,32 @@ require_once('time.lib.php');
 			if (oldCount ==1){
 				$("#handle" + parent + txtStart).show();
 			}
+			
+			// ajax call to resize the htmlid
+			var postData = 'username=' + $('#userNameInput').val() + '&htmlID=' + parent + txtStart  
+				+ '&action=resize' + '&end=' + newEnd;
+			
+			
+			$.ajax({
+				type: "POST",
+			   	url: "ajaxcal.php",
+			   	data: postData,
+			   	success: function(msg){
+			   		
+			   		// debug code
+			   		// $('#overCalendar > span:last').remove();
+			    	// $('#overCalendar').append('<span>'  + msg + '::' + parent + start + '</span>');
+			    	
+			      	
+			      	var pos = msg.indexOf("SUCCESS");
+					if (pos >= 0)
+					{
+						
+						$('#' + parent + txtStart).css("background","green");
+					}
+			    	
+			   	}
+			});					
 		
 		} //end of if saved 
 		else {
