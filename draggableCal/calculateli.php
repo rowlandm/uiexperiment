@@ -757,7 +757,7 @@ require_once('time.lib.php');
 		    	
  		    	var myObject = json_parse(msg);
 				
-		    	alert('tset');
+		    	alert(myObject[0].appt_name);
 		   	}
 		});
 		
