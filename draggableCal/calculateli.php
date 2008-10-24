@@ -12,7 +12,7 @@ require_once('time.lib.php');
 <script src="jquery-ui-personalized-1.6rc2.min.js"></script>
 <link rel="stylesheet" type="text/css" href="jquery.contextMenu.css" />
 <script type="text/javascript" src="jquery.contextMenu.js"></script>
-<!--  <script type="text/javascript" src="json.js"></script> -->
+<script type="text/javascript" src="json.js"></script> 
 <script>
   	
   	
@@ -755,9 +755,9 @@ require_once('time.lib.php');
 		    	$('#overCalendar').append('<span>'  + msg + '</span>');
 		    	
 		    	
-// 		    	var myObject = json_parse(msg);
+ 		    	var myObject = json_parse(msg);
 				
-		    	
+		    	alert('tset');
 		   	}
 		});
 		
