@@ -2,7 +2,7 @@
 // set adodb parameters for database
 include('adodb/adodb.inc.php');
 include("adodb/adodb-exceptions.inc.php");
-
+include("adodb/adodb-active-record.inc.php");
 
 $postListName = $_POST['list_name'];
 
@@ -37,7 +37,7 @@ if ($_POST['type'] == "uniqueList"){
 	
 }
 
-include("adodb/adodb-active-record.inc.php");
+
 ADOdb_Active_Record::SetDatabaseAdapter($DB);
 class zane_whattodo extends ADOdb_Active_Record {
     var $_table = 'whattodo';
