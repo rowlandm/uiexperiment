@@ -15,10 +15,436 @@ require_once('time.lib.php');
 <script type="text/javascript" src="json.js"></script> 
 <script>
   	
+	function refreshCalendar(showNumDays){
+		/*
+		$showNumDays = 7;
+		$start = "05:45";
+		$end = "22:30";
+		$slots = "15";
+		*/
+		
+		var start = '05:45';
+		var end = '22:30';
+		var slots = '15';
+		
+		
+		
+        var postData = 'action=retrieve&username='+ $('#userNameInput').val() + '&showNumDays=' + showNumDays  
+        			+ '&start=' + start + '&end=' + end + '&slots=' + slots  + '&action=returnInitialHTML';  
+        
+        // initialise the calendar
+		// call ajax from the database to return the records and use them to create events
+  		$.ajax({
+			type: "POST",
+		   	url: "ajaxcal.php",
+		   	data: postData,
+		   	success: function(msg){
+		   		$('#overCalendar').html(msg);
+		   		
+		   		refreshCalendarEvents();
+
+				
+				
+		        var collection;
+		
+				$('#refreshDIV').remove();
+				// radio button to turn refresh on and off when submitting data for events
+				newRadioRefreshHTML = '<div id=refreshDiv><br>Refresh after every action? <br><input type="radio"  name="refreshRadio" value="on"> ON '  
+							+  '<input type="radio"  name="refreshRadio" value="off" checked> OFF <br></div>';
+				$('#overCalendar').prepend(newRadioRefreshHTML);
+				
+				//alert($('#refreshDiv > :radio:checked').val());
+		
+		
+				// radio button to choose week or fortnight View
+				$('#refreshdaysViewDiv').remove();
+				refreshdaysViewDivHTML = '<div id=refreshdaysViewDiv> ' +
+										' <input id=showWeeklyView type=submit value="Show Weekly View"> ' + 
+										' <input id=showFortnightlyView type=submit value="Show Fortnightly View"> ' +
+										'</div>';
+				$('#overCalendar').prepend(refreshdaysViewDivHTML);
+				
+				$('#showWeeklyView').click(function(){
+					
+					refreshCalendar(7);
+					
+				});
+				$('#showFortnightlyView').click(function(){
+				
+					refreshCalendar(14);
+					
+				});
+				
+				
+				
+				
+				
+		        // radio button to choose 15,30 or 60 minute intervals
+				/* 
+				$('#refreshDIV').remove();
+				newRadioHTML = '<div id=refreshDiv><br>Refresh after every action? <br><input type="radio"  name="refreshRadio" value="on"> ON '  
+							+  '<input type="radio"  name="refreshRadio" value="off" checked> OFF <br></div>';
+				$('#overCalendar').prepend(newRadioHTML);
+				
+				*/ 
+				
+				
+		        
+		          
+		        // This is to set all ul tags that are in the overCalendar DIV to be selectable - includes li tags too
+		       	$('ul').selectable({
+		       	
+		       		// this is what to do when you are selecting
+		       		// want to stop li's with class of saved from being selected
+		       		// as they have already been selected.
+		       		selecting: function(ev, ui) {
+		
+		               if ($(ui.selecting).hasClass("saved")){
+		               		// can we stop it from being selected?     
+		               		// class is added ui-selecting when you are selecting li's          	
+		               		$(ui.selecting).removeClass('ui-selecting');
+		
+		               		
+		               
+		               }
+		                
+		
+		            },
+		       	
+		
+		            // this sets a permanent saved class to each element selected
+		            // if the name is set 
+		            // it also creates a div to overlay the elements selected.
+		        	stop: function(e,ui){
+						                               	
+						// once the selection has stopped, it will chnage elements
+						// from class ui-selecting to ui-selected
+						// the :visible is to get all the li's that have a class
+						// of ui-selected that are visible
+		                collection = jQuery('li.ui-selected:visible');
+		                    
+						
+						
+						
+						if(collection) {
+		                	
+		                	// can find out the start and end times
+		                	// and also the number of elemetns selected
+		                	var count = collection.size();
+		                	var start = collection.eq(0).text();
+		                	var end = collection.eq(count - 1).text();
+		                	
+		                	
+		                    // want to check that the start and end dates
+		                    // have all elements selected between them
+		                    // eg. from 9:00 to 9:45 there are 4 elements
+		                    // 9:00, 9:15, 9:30 and 9:45
+		                    // if the count says there are only 3 elements
+		                    // it means thatone of those elements is
+		                    // already saved and the selection is invalid
+		                    var startDate = new Date();
+		                    var endDate = new Date();
+		                    
+		                    var timeStartArray = start.split(":");
+		                    
+		                    startDate.setHours(timeStartArray[0]);
+		                    startDate.setMinutes(timeStartArray[1]);
+		                    
+		                    var timeEndArray = end.split(":");
+		                    
+		                    endDate.setHours(timeEndArray[0]);
+		                    endDate.setMinutes(timeEndArray[1]);
+		                    
+		                    var diffms = endDate.getTime() - startDate.getTime();
+		                    
+		                    
+		                    diffhours = diffms / (1000 * 60 * 60); 
+		                    diffhours = diffhours + 0.25;
+		                    
+		                    expectantCount = diffhours / 0.25; 
+		                    
+		                    
+		                    
+		                    // check that there the difference between the start and end times match up to the number of counts we expect
+		                    if (expectantCount != count){
+								alert ("Invalid selection.");
+								// reset all the selections if invalid selection
+		    	                collection.each(function() {
+		        	            	//set the new height based on the height of the li height:20px  and bottom of 2px
+		            	        	$(this).removeClass('ui-selected');
+		           				
+		                	    });						
+								
+							}
+							else {
+							
+								if (start != ""){
+		
+									// clear out any old input divs
+									$("#inputDiv").remove();	
+									
+									var newInputDiv = '<div id="inputDiv" style=" position:absolute; top:55; left:44;">' + 
+									' <table bgcolor="#0000FF"> ' + 
+									' <tr><td id=inputDivTitle color="#FFFFFF">Details</td></tr> ' + 
+									' <tr><td bgcolor="#8888FF">Name:</td><td> <input id=inputName type=text> </td></tr> ' + 
+									' <tr><td bgcolor="#8888FF">Type:</td><td> <input id=inputType type=text> </td></tr> ' +
+									' <tr><td bgcolor="#8888FF">Job:</td><td> <input id=inputCode type=text> </td></tr> ' +
+									' <tr><td bgcolor="#8888FF">Details:</td><td> <textarea id=inputDetails></textarea> </td></tr> ' +
+									' <tr><td colspan=2 bgcolor="#8888FF"><input type=submit id=inputSubmit value=Submit ><input type=submit id=cancelSubmit value=Cancel </td></tr> ' +
+									' </table></div> ';
+									
+									$('#overCalendar').append(newInputDiv);
+					    			
+									$('#inputDiv :input:visible:enabled[@type=text]').keyup(function(e) {
+						
+										if(e.keyCode == 27) {
+											$('#cancelSubmit').click();
+										}
+						
+									
+										//alert(e.keyCode);
+										if(e.keyCode == 13) {
+											$('#inputSubmit').click();
+										}
+									});
+		
+												
+									var topOffset  = e.pageY  - 100; 
+									var leftOffset = e.pageX + 18 ; 
+									
+									$('#inputDivTitle').text('Add new appointment');
+		
+									$("#inputDiv").show().css("width","500px")
+									.css("top",topOffset).css("left",leftOffset);
+																
+									$('#cancelSubmit').click(function(){
+										$("#inputDiv").hide();	
+										// if no name then 
+										// reset all the selections
+		    			                collection.each(function() {
+		        	    	    	    	
+		            	    	    		$(this).removeClass('ui-selected');
+		           					
+		                	    		});										
+									});
+									
+									// get the focus on the first text area
+									$("#inputDiv :input:visible:enabled:first").focus();
+									
+									
+									$('#inputSubmit').click(function(){
+										$("#inputDiv").hide();	
+										
+		
+										// var name = prompt("Please enter in the name of the appointment", "");
+										var name = $('#inputName').val(); 	
+											
+										
+										// going to add the start to the class, and it has problems
+										// seeing : when in the class, so changing it to -
+																	
+										if (name != null && name != ""){  							
+											
+											
+											collection = jQuery('li.ui-selected:visible');
+											setSelectedElementsToSave ('add',collection,name,$('#inputType').val(),$('#inputCode').val(),$('#inputDetails').val() );								
+											
+										                	
+										} // end of if name != ""	
+										else {
+											// if no name then 
+											// reset all the selections
+			    			                collection.each(function() {
+			        	    	    	    	
+			            	    	    		$(this).removeClass('ui-selected');
+			           					
+			                	    		});						
+											
+										}								
+									})
+									
+								
+																
+										
+								} // end of start !+ "" 
+							
+							}
+				
+							                                  
+		            	}
+		            }				
+		
+		         });    	
+		
+		
+				$("#savedDivMenu").hide();
+				
+		
+		         
+		         
+		        // this is to allow the draggable to drop into something 
+				$("li").droppable({ 
+				
+					// only accept savedDiv class objects
+				    accept: ".savedDiv", 
+				    tolerance:	'pointer', // this along with the handle option in draggable is to reduce the area that the user can drop to improve accuracy 
+				    drop: function(ev, ui) { 
+				        
+					    // find the data hidden in the span of the element el
+			  			var spanName = ui.draggable.attr('id') + 'data';  		
+			  		 	
+						// get an array of the data that is hidden in the span
+						var spanValues = $('#' + spanName).text().split(';');
+						
+						
+						
+				        var divLength = spanValues[4];	
+				        var parent = spanValues[5];
+				        var start = spanValues[1];	  
+				        var oldName = spanValues[0];      
+				        var oldType = spanValues[6];
+				        var oldCode = spanValues[7];
+				        var oldDetails = spanValues[8];
+				        var txtStart = start.replace(/:/,"-");
+				        
+				        if ($(this).hasClass('saved') && 
+		        		    !(($(this).parent().attr('id') == parent) && 
+		        		       $(this).hasClass(txtStart))) 		        
+				        {
+				        	// alert ('Invalid Move');
+		
+				        }
+				        else {
+				        	
+				        	//set the class so we can find it later
+				        	$(this).addClass('moved');
+				        	
+				        	// if only 1 li long, then set things in now
+				        	if (divLength ==1) {
+				        		// if it gets to here everything has been successful so far
+								// convert all addClass('moved') to be a new div
+								
+								deleteSavedDiv ($('#' + parent + txtStart));
+								
+								collection = jQuery('li.moved:visible');
+								
+								setSelectedElementsToSave ('moved',collection,oldName,oldType,oldCode,oldDetails);	
+								
+								// delete the old details
+								// deleteOldElements(
+								
+								
+								
+								
+						        
+						        
+		     	
+				        		
+				        	}
+				        	else {
+					        	
+					        	// $("#overCalendar").append($(this).parent().attr('id') + ' ' + $(this).text() + '<br>');
+						        
+					        	
+						        // get all the rest of the siblings to check if they can be moved 
+						        $(this).nextAll()
+						        .each(function (i){
+						        	
+						        	
+						        	//$("#overCalendar").append(i + '::' + $(this).text() + '<Br>');
+						        	
+						        	//set the class so we can find it later
+						        	$(this).addClass('moved');
+						        	
+							        if ($(this).hasClass('saved') && 
+					        		    !(($(this).parent().attr('id') == parent) && 
+					        		       $(this).hasClass(txtStart))) 				        	
+						        	{
+						        		// alert ('Invalid Move');
+						        		
+		
+						        		return false;
+						        	}
+						        	
+						        	
+			
+									// retrieve the length fromt the hidden div
+									// we take away 2 as the header of the draggable is not 
+									// in this list and the first of the siblings starts at 0
+							        //var divLengthValue = $("#divLength").text();
+							        divLengthValue = parseFloat(divLength) - 2;
+						        	if (i == divLengthValue ){
+						        		
+						        		
+						        		// if it gets to here everything has been successful so far
+		
+										
+										// delete the old details before creating the saved details
+										/*	example where moving 30 minute appointment back by 15 minutes
+											these are the classes of the li
+										
+													before			during move				after move
+											09-00	saved 09-00		saved 09-00				
+											09-15	saved 09-00		saved 09-00 moved		saved 09-15
+											09-30					moved					saved 09-15
+											09-45
+										
+											So if we converted the moved to saved first, 09-15 li would then be
+											
+											saved 09-15
+											
+											So if we deleted the saved second, then the 09-15 li would then be
+											
+											09-15
+											
+											which would cause problems later on
+										
+											so we delete the saved from the old ones first before we convert the moved
+										
+										
+										*/ 
+																	
+										
+										
+										deleteSavedDiv ($('#' + parent + txtStart));
+		
+										// convert all addClass('moved') to be a new div								
+										collection = jQuery('li.moved:visible');
+										
+										setSelectedElementsToSave ('moved',collection,oldName,oldType,oldCode,oldDetails);
+										
+		
+										
+										// alert (parent +  '::' + txtStart + '::' +  oldName + '::' + divLength );
+										
+										
+			        		
+						        		return false;
+						        	}   
+						        
+						        });
+					        
+							}		        
+					} // else if first one is saved
+					 
+				    // clear out any addClass('moved') that was set
+				    // regardless of failure or not
+					$("* > .moved").removeClass('moved');
+				        
+				    }  
+				});         
+				
+		   		
+		   		
+		   	}
+		});		
+		
+		
+		
+	}
   	
   	
-  	
-  	function refreshCalendar(){
+  	function refreshCalendarEvents(){
         
         // remove divs with class of savedDiv and then remove the li.saved items to refresh
         $('#overCalendar > div').filter('.savedDiv').remove();
@@ -34,7 +460,7 @@ require_once('time.lib.php');
         // split puts it into an array with day as the delimiter. so mondayDate[1] should have the date for the monday
         var mondayDate = $('ul[id*="timeslotsMonday"]').attr('id').split('day');
         
-        var postData = 'action=retrieve&username='+ $('#userNameInput').val() + '&mondayDate=' + mondayDate[1];  
+        var postData = 'action=retrieve&username='+ $('#userNameInput').val() + '&mondayDate=' + mondayDate[1] + '&showNumDays=14' ;  
         
         // initialise the calendar
 		// call ajax from the database to return the records and use them to create events
@@ -443,7 +869,7 @@ require_once('time.lib.php');
 						$('#' + parent + txtStart).css("background","green");
 						
 						if ($('#refreshDiv > :radio:checked').val() == 'on'){
-							refreshCalendar();
+							refreshCalendarEvents();
 						}
 					}
 			    	
@@ -611,7 +1037,7 @@ require_once('time.lib.php');
 			}	
 			if (action == "refresh"){
 
-				refreshCalendar();
+				refreshCalendarEvents();
 														
 			}			
 			if (action == "edit"){
@@ -686,7 +1112,7 @@ require_once('time.lib.php');
 						
 						$('#' + parent + txtStart).css("background","green");
 						if ($('#refreshDiv > :radio:checked').val() == 'on'){
-							refreshCalendar();
+							refreshCalendarEvents();
 						}
 					}
 			    	
@@ -871,7 +1297,7 @@ require_once('time.lib.php');
 			    	// $('#overCalendar').append('<span>'  + msg + '::' + parent + txtStart + '</span>');
 			    	
 			      	if ($('#refreshDiv > :radio:checked').val() == 'on'){
-						refreshCalendar();
+						refreshCalendarEvents();
 					}
 			      	
 			      	var pos = msg.indexOf("SUCCESS");
@@ -896,372 +1322,21 @@ require_once('time.lib.php');
   	
   	/*
   	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Start of the document ready !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Start of the document ready !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Start of the document ready !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Start of the document ready !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Start of the document ready !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Start of the document ready !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Start of the document ready !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Start of the document ready !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   	*/
   	
   	$(document).ready(function(){
 
-
 		$("#hoverPopup").hide();
-		
-        var collection;
 
-		// radio button to turn refresh on and off when submitting data for events
-		newRadioHTML = '<div id=refreshDiv><br>Refresh after every action? <br><input type="radio"  name="refreshRadio" value="on"> ON '  
-					+  '<input type="radio"  name="refreshRadio" value="off" checked> OFF <br></div>';
-		$('#overCalendar').prepend(newRadioHTML);
-		
-		//alert($('#refreshDiv > :radio:checked').val());
-
-		// initial refresh
-		refreshCalendar();
-		
-		
-         
-        
-          
-        // This is to set all ul tags that are in the overCalendar DIV to be selectable - includes li tags too
-       	$('ul').selectable({
-       	
-       		// this is what to do when you are selecting
-       		// want to stop li's with class of saved from being selected
-       		// as they have already been selected.
-       		selecting: function(ev, ui) {
-
-               if ($(ui.selecting).hasClass("saved")){
-               		// can we stop it from being selected?     
-               		// class is added ui-selecting when you are selecting li's          	
-               		$(ui.selecting).removeClass('ui-selecting');
-
-               		
-               
-               }
-                
-
-            },
-       	
-
-            // this sets a permanent saved class to each element selected
-            // if the name is set 
-            // it also creates a div to overlay the elements selected.
-        	stop: function(e,ui){
-				                               	
-				// once the selection has stopped, it will chnage elements
-				// from class ui-selecting to ui-selected
-				// the :visible is to get all the li's that have a class
-				// of ui-selected that are visible
-                collection = jQuery('li.ui-selected:visible');
-                    
-				
-				
-				
-				if(collection) {
-                	
-                	// can find out the start and end times
-                	// and also the number of elemetns selected
-                	var count = collection.size();
-                	var start = collection.eq(0).text();
-                	var end = collection.eq(count - 1).text();
-                	
-                	
-                    // want to check that the start and end dates
-                    // have all elements selected between them
-                    // eg. from 9:00 to 9:45 there are 4 elements
-                    // 9:00, 9:15, 9:30 and 9:45
-                    // if the count says there are only 3 elements
-                    // it means thatone of those elements is
-                    // already saved and the selection is invalid
-                    var startDate = new Date();
-                    var endDate = new Date();
-                    
-                    var timeStartArray = start.split(":");
-                    
-                    startDate.setHours(timeStartArray[0]);
-                    startDate.setMinutes(timeStartArray[1]);
-                    
-                    var timeEndArray = end.split(":");
-                    
-                    endDate.setHours(timeEndArray[0]);
-                    endDate.setMinutes(timeEndArray[1]);
-                    
-                    var diffms = endDate.getTime() - startDate.getTime();
-                    
-                    
-                    diffhours = diffms / (1000 * 60 * 60); 
-                    diffhours = diffhours + 0.25;
-                    
-                    expectantCount = diffhours / 0.25; 
-                    
-                    
-                    
-                    // check that there the difference between the start and end times match up to the number of counts we expect
-                    if (expectantCount != count){
-						alert ("Invalid selection.");
-						// reset all the selections if invalid selection
-    	                collection.each(function() {
-        	            	//set the new height based on the height of the li height:20px  and bottom of 2px
-            	        	$(this).removeClass('ui-selected');
-           				
-                	    });						
-						
-					}
-					else {
-					
-						if (start != ""){
-
-							// clear out any old input divs
-							$("#inputDiv").remove();	
-							
-							var newInputDiv = '<div id="inputDiv" style=" position:absolute; top:55; left:44;">' + 
-							' <table bgcolor="#0000FF"> ' + 
-							' <tr><td id=inputDivTitle color="#FFFFFF">Details</td></tr> ' + 
-							' <tr><td bgcolor="#8888FF">Name:</td><td> <input id=inputName type=text> </td></tr> ' + 
-							' <tr><td bgcolor="#8888FF">Type:</td><td> <input id=inputType type=text> </td></tr> ' +
-							' <tr><td bgcolor="#8888FF">Job:</td><td> <input id=inputCode type=text> </td></tr> ' +
-							' <tr><td bgcolor="#8888FF">Details:</td><td> <textarea id=inputDetails></textarea> </td></tr> ' +
-							' <tr><td colspan=2 bgcolor="#8888FF"><input type=submit id=inputSubmit value=Submit ><input type=submit id=cancelSubmit value=Cancel </td></tr> ' +
-							' </table></div> ';
-							
-							$('#overCalendar').append(newInputDiv);
-			    			
-							$('#inputDiv :input:visible:enabled[@type=text]').keyup(function(e) {
-				
-								if(e.keyCode == 27) {
-									$('#cancelSubmit').click();
-								}
-				
-							
-								//alert(e.keyCode);
-								if(e.keyCode == 13) {
-									$('#inputSubmit').click();
-								}
-							});
-
-										
-							var topOffset  = e.pageY  - 100; 
-							var leftOffset = e.pageX + 18 ; 
-							
-							$('#inputDivTitle').text('Add new appointment');
-
-							$("#inputDiv").show().css("width","500px")
-							.css("top",topOffset).css("left",leftOffset);
-														
-							$('#cancelSubmit').click(function(){
-								$("#inputDiv").hide();	
-								// if no name then 
-								// reset all the selections
-    			                collection.each(function() {
-        	    	    	    	
-            	    	    		$(this).removeClass('ui-selected');
-           					
-                	    		});										
-							});
-							
-							// get the focus on the first text area
-							$("#inputDiv :input:visible:enabled:first").focus();
-							
-							
-							$('#inputSubmit').click(function(){
-								$("#inputDiv").hide();	
-								
-
-								// var name = prompt("Please enter in the name of the appointment", "");
-								var name = $('#inputName').val(); 	
-									
-								
-								// going to add the start to the class, and it has problems
-								// seeing : when in the class, so changing it to -
-															
-								if (name != null && name != ""){  							
-									
-									
-									collection = jQuery('li.ui-selected:visible');
-									setSelectedElementsToSave ('add',collection,name,$('#inputType').val(),$('#inputCode').val(),$('#inputDetails').val() );								
-									
-								                	
-								} // end of if name != ""	
-								else {
-									// if no name then 
-									// reset all the selections
-	    			                collection.each(function() {
-	        	    	    	    	
-	            	    	    		$(this).removeClass('ui-selected');
-	           					
-	                	    		});						
-									
-								}								
-							})
-							
-						
-														
-								
-						} // end of start !+ "" 
-					
-					}
-		
-					                                  
-            	}
-            }				
-
-         });    	
-
-
-		$("#savedDivMenu").hide();
-		
-
-         
-         
-        // this is to allow the draggable to drop into something 
-		$("li").droppable({ 
-		
-			// only accept savedDiv class objects
-		    accept: ".savedDiv", 
-		    tolerance:	'pointer', // this along with the handle option in draggable is to reduce the area that the user can drop to improve accuracy 
-		    drop: function(ev, ui) { 
-		        
-			    // find the data hidden in the span of the element el
-	  			var spanName = ui.draggable.attr('id') + 'data';  		
-	  		 	
-				// get an array of the data that is hidden in the span
-				var spanValues = $('#' + spanName).text().split(';');
-				
-				
-				
-		        var divLength = spanValues[4];	
-		        var parent = spanValues[5];
-		        var start = spanValues[1];	  
-		        var oldName = spanValues[0];      
-		        var oldType = spanValues[6];
-		        var oldCode = spanValues[7];
-		        var oldDetails = spanValues[8];
-		        var txtStart = start.replace(/:/,"-");
-		        
-		        if ($(this).hasClass('saved') && 
-        		    !(($(this).parent().attr('id') == parent) && 
-        		       $(this).hasClass(txtStart))) 		        
-		        {
-		        	// alert ('Invalid Move');
-
-		        }
-		        else {
-		        	
-		        	//set the class so we can find it later
-		        	$(this).addClass('moved');
-		        	
-		        	// if only 1 li long, then set things in now
-		        	if (divLength ==1) {
-		        		// if it gets to here everything has been successful so far
-						// convert all addClass('moved') to be a new div
-						
-						deleteSavedDiv ($('#' + parent + txtStart));
-						
-						collection = jQuery('li.moved:visible');
-						
-						setSelectedElementsToSave ('moved',collection,oldName,oldType,oldCode,oldDetails);	
-						
-						// delete the old details
-						// deleteOldElements(
-						
-						
-						
-						
-				        
-				        
-     	
-		        		
-		        	}
-		        	else {
-			        	
-			        	// $("#overCalendar").append($(this).parent().attr('id') + ' ' + $(this).text() + '<br>');
-				        
-			        	
-				        // get all the rest of the siblings to check if they can be moved 
-				        $(this).nextAll()
-				        .each(function (i){
-				        	
-				        	
-				        	//$("#overCalendar").append(i + '::' + $(this).text() + '<Br>');
-				        	
-				        	//set the class so we can find it later
-				        	$(this).addClass('moved');
-				        	
-					        if ($(this).hasClass('saved') && 
-			        		    !(($(this).parent().attr('id') == parent) && 
-			        		       $(this).hasClass(txtStart))) 				        	
-				        	{
-				        		// alert ('Invalid Move');
-				        		
-
-				        		return false;
-				        	}
-				        	
-				        	
-	
-							// retrieve the length fromt the hidden div
-							// we take away 2 as the header of the draggable is not 
-							// in this list and the first of the siblings starts at 0
-					        //var divLengthValue = $("#divLength").text();
-					        divLengthValue = parseFloat(divLength) - 2;
-				        	if (i == divLengthValue ){
-				        		
-				        		
-				        		// if it gets to here everything has been successful so far
-
-								
-								// delete the old details before creating the saved details
-								/*	example where moving 30 minute appointment back by 15 minutes
-									these are the classes of the li
-								
-											before			during move				after move
-									09-00	saved 09-00		saved 09-00				
-									09-15	saved 09-00		saved 09-00 moved		saved 09-15
-									09-30					moved					saved 09-15
-									09-45
-								
-									So if we converted the moved to saved first, 09-15 li would then be
-									
-									saved 09-15
-									
-									So if we deleted the saved second, then the 09-15 li would then be
-									
-									09-15
-									
-									which would cause problems later on
-								
-									so we delete the saved from the old ones first before we convert the moved
-								
-								
-								*/ 
-															
-								
-								
-								deleteSavedDiv ($('#' + parent + txtStart));
-
-								// convert all addClass('moved') to be a new div								
-								collection = jQuery('li.moved:visible');
-								
-								setSelectedElementsToSave ('moved',collection,oldName,oldType,oldCode,oldDetails);
-								
-
-								
-								// alert (parent +  '::' + txtStart + '::' +  oldName + '::' + divLength );
-								
-								
-	        		
-				        		return false;
-				        	}   
-				        
-				        });
-			        
-					}		        
-			} // else if first one is saved
-			 
-		    // clear out any addClass('moved') that was set
-		    // regardless of failure or not
-			$("* > .moved").removeClass('moved');
-		        
-		    }  
-		});         
-		
+		//initial refresh with 7 days
+		refreshCalendar(7);
 		
   	});
   	</script>
@@ -1328,62 +1403,12 @@ li {
 
 	<option value=rowland.mosbergen>rowland.mosbergen</option>
 	<!--   <option value=corey.evans>corey.evans</option> -->
+	
+	
 
 </select></div>
 
-<div id=overCalendar><?php
-
-$dateToday = getdate();
-
-// echo $dateToday[weekday] . '::' . $dateToday[mday] . '::' . $dateToday[wday];
-
-$daysFromMonday = $dateToday[wday] -1;
-
-$date = new DateTime();
-$date->modify("-" . $daysFromMonday . "day");
-
-$showNumDays = 7;
-
-$start = "05:45";
-$end = "22:30";
-$slots = "15";
-$format = "24";
-
-$timeslotArray = timeslotArray($start,$end,$slots,$format);
-
-?>
-
-<table CELLSPACING=0>
-	<tr>
-		<td></td>
-		<?php 
-		for ($count = 0;$count < $showNumDays;$count++ ){
-
-			?>
-			<td><?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-	
-			<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-			<?php
-	
-	
-			foreach($timeslotArray as $value){
-				?>
-				<li><?php echo $value;?></li>
-				<?php
-				
-			}
-			?>
-			</ul>
-			</td>
-			
-			<?php 
-		
-			$date->modify("+1 day");
-		} // for  loop
-		
-		?>
-	</tr>
-</table>
+<div id=overCalendar>
 
 </div>
 

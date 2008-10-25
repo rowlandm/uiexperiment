@@ -2,6 +2,7 @@
 
 include('adodb/adodb.inc.php');
 include("adodb/adodb-active-record.inc.php");
+require_once('time.lib.php');
 
 $server = 'cel-bne-dev1';
 $user = 'uiexperiment';
@@ -133,7 +134,7 @@ switch ($action){
 	
 	case "retrieve":
 		$mondayDate = $_POST['mondayDate'];
-		
+		$showNumDays = $_POST['showNumDays']; // eg 7 days in a week or 14 for a fortnight
 		
 		$changeDate = explode('-',$mondayDate); 
 		
@@ -142,11 +143,9 @@ switch ($action){
 		// want the format 2008-10-23 00:00:00
 		$start = $mondayDate. ' 00:00:00';
 		
-		
-		
 		// end date is +7 days and - 1 second
 		$sundayDate = new DateTime($mondayDate);
-		$sundayDate->modify("+7 day");
+		$sundayDate->modify("+".$showNumDays." day");
 		
 		$end = $sundayDate->format('Y-m-d') . ' 23:59:59';
 		
@@ -223,7 +222,66 @@ switch ($action){
 		}	
 		echo 'SUCCESS: resized successfully.'; 
 	break;	
+	case "returnInitialHTML":
+		
+		/*
+		$showNumDays = 7;
+		$start = "05:45";
+		$end = "22:30";
+		$slots = "15";
+		$format = "24";
+		*/
+		
+		$showNumDays = $_POST['showNumDays']; // eg 7 days in a week or 14 for a fortnight
+		$start = $_POST['start']; // eg. 05:45
+		$end = $_POST['end'];  // eg. 22:30
+		$slots = $_POST['slots']; // eg 15 is every 15 minutes
+		$format = "24";
+		
+		// die($showNumDays . $start . $end . $slots);
+		
+		$dateToday = getdate();
+		
+		// echo $dateToday[weekday] . '::' . $dateToday[mday] . '::' . $dateToday[wday];
+		
+		$daysFromMonday = $dateToday[wday] -1;
+		
+		$date = new DateTime();
+		$date->modify("-" . $daysFromMonday . "day");
+		
+		
+		$timeslotArray = timeslotArray($start,$end,$slots,$format);
+		
+		$returnInitialHTML = '<table CELLSPACING=0>
+			<tr>
+				<td></td>';
+				
+		
+		for ($count = 0;$count < $showNumDays;$count++ ){
+
+			
+			$returnInitialHTML.= '<td>'. $date->format("l") . '<br>'.$date->format("d-m-Y");
 	
+			$returnInitialHTML.= '<ul id="timeslots'. $date->format("ld-m-Y").'">';
+	
+	
+			foreach($timeslotArray as $value){
+				
+				$returnInitialHTML.='<li>'. $value.'</li>';
+				
+			}
+			$returnInitialHTML.=' </ul>	</td>';
+			
+			
+		
+			$date->modify("+1 day");
+		} // for  loop
+				
+				
+		$returnInitialHTML.='	</tr> </table>';
+		echo $returnInitialHTML;	
+		
+	break;
 	
 }
 
