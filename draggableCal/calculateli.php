@@ -15,6 +15,9 @@ require_once('time.lib.php');
 <script type="text/javascript" src="json.js"></script> 
 <script>
   	
+  	
+  	
+  	
   	function refreshCalendar(){
         
         // remove divs with class of savedDiv and then remove the li.saved items to refresh
@@ -1339,193 +1342,46 @@ $daysFromMonday = $dateToday[wday] -1;
 $date = new DateTime();
 $date->modify("-" . $daysFromMonday . "day");
 
+$showNumDays = 7;
+
+$start = "05:45";
+$end = "22:30";
+$slots = "15";
+$format = "24";
+
+$timeslotArray = timeslotArray($start,$end,$slots,$format);
 
 ?>
 
 <table CELLSPACING=0>
 	<tr>
 		<td></td>
-		<td><?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+		<?php 
+		for ($count = 0;$count < $showNumDays;$count++ ){
 
-		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-		<?php
-
-		$start = "05:45";
-		$end = "17:30";
-		$slots = "15";
-		$format = "24";
-
-		$nBlocked=0;
-		$timeslotArray = timeslotArray($start,$end,$slots,$format);
-		foreach($timeslotArray as $value){
-			if(in_array($value, $blockedArray)){
-				$nBlocked++;
-				?>
-
-			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
-
+			?>
+			<td><?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
+	
+			<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
 			<?php
-			}else{
+	
+	
+			foreach($timeslotArray as $value){
 				?>
-			<li><?php echo $value;?></li>
-			<?php
+				<li><?php echo $value;?></li>
+				<?php
+				
 			}
-		}
+			?>
+			</ul>
+			</td>
+			
+			<?php 
+		
+			$date->modify("+1 day");
+		} // for  loop
+		
 		?>
-		</ul>
-		</td>
-		<td><?php 
-		$date->modify("+1 day");
-
-		?> <?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-
-
-		<?php
-		$nBlocked=0;
-		$timeslotArray = timeslotArray($start,$end,$slots,$format);
-		foreach($timeslotArray as $value){
-			if(in_array($value, $blockedArray)){
-				$nBlocked++;
-				?>
-
-			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
-
-			<?php
-			}else{
-				?>
-			<li><?php echo $value;?></li>
-			<?php
-			}
-		}
-		?>
-		</ul>
-		</td>
-		<td><?php 
-		$date->modify("+1 day");
-
-		?> <?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-
-
-		<?php
-		$nBlocked=0;
-		$timeslotArray = timeslotArray($start,$end,$slots,$format);
-		foreach($timeslotArray as $value){
-			if(in_array($value, $blockedArray)){
-				$nBlocked++;
-				?>
-
-			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
-
-			<?php
-			}else{
-				?>
-			<li><?php echo $value;?></li>
-			<?php
-			}
-		}
-		?>
-		</ul>
-		</td>
-		<td><?php 
-		$date->modify("+1 day");
-
-		?> <?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-		<?php
-		$nBlocked=0;
-		$timeslotArray = timeslotArray($start,$end,$slots,$format);
-		foreach($timeslotArray as $value){
-			if(in_array($value, $blockedArray)){
-				$nBlocked++;
-				?>
-
-			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
-
-			<?php
-			}else{
-				?>
-			<li><?php echo $value;?></li>
-			<?php
-			}
-		}
-		?>
-		</ul>
-		</td>
-		<td><?php 
-		$date->modify("+1 day");
-
-		?> <?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-		<?php
-		$nBlocked=0;
-		$timeslotArray = timeslotArray($start,$end,$slots,$format);
-		foreach($timeslotArray as $value){
-			if(in_array($value, $blockedArray)){
-				$nBlocked++;
-				?>
-
-			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
-
-			<?php
-			}else{
-				?>
-			<li><?php echo $value;?></li>
-			<?php
-			}
-		}
-		?>
-		</ul>
-		</td>
-		<td><?php 
-		$date->modify("+1 day");
-		?> <?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-		<?php
-		$nBlocked=0;
-		$timeslotArray = timeslotArray($start,$end,$slots,$format);
-		foreach($timeslotArray as $value){
-			if(in_array($value, $blockedArray)){
-				$nBlocked++;
-				?>
-
-			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
-
-			<?php
-			}else{
-				?>
-			<li><?php echo $value;?></li>
-			<?php
-			}
-		}
-		?>
-		</ul>
-		</td>
-		<td><?php 
-		$date->modify("+1 day");
-		?> <?php echo $date->format("l"); echo "<br>".$date->format("d-m-Y");?>
-		<ul id="timeslots<? echo $date->format("ld-m-Y"); ?>">
-		<?php
-		$nBlocked=0;
-		$timeslotArray = timeslotArray($start,$end,$slots,$format);
-		foreach($timeslotArray as $value){
-			if(in_array($value, $blockedArray)){
-				$nBlocked++;
-				?>
-
-			<li class=saved style='background: black; color: white;'><?php echo $value;?></li>
-
-			<?php
-			}else{
-				?>
-			<li><?php echo $value;?></li>
-			<?php
-			}
-		}
-		?>
-		</ul>
-		</td>
 	</tr>
 </table>
 
