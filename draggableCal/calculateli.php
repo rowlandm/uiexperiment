@@ -606,7 +606,11 @@ require_once('time.lib.php');
 				calculateTotals('weekly',el);
 														
 			}	
-			
+			if (action == "refresh"){
+
+				refreshCalendar();
+														
+			}			
 			if (action == "edit"){
 					editSavedDiv(el,pos);
 		
@@ -1535,7 +1539,7 @@ $date->modify("-" . $daysFromMonday . "day");
 	<li class="dailyTotals"><a href="#dailyTotals">Daily Totals</a></li>
 	<li class="weeklyTotals"><a href="#weeklyTotals">Weekly Totals</a></li>
 	<li class="edit"><a href="#edit">Edit</a></li>
-
+	<li class="refresh" id=refreshMenu><a href="#refresh">Refresh</a></li>
 	<li class="delete"><a href="#delete">Delete</a></li>
 	<li class="quit separator"><a href="#quit">Quit</a></li>
 </ul>
