@@ -189,6 +189,31 @@ switch ($action){
 		echo 'SUCCESS: deleted successfully.'; 
 	break;
 	
+	
+	case "returnUserNames":
+		
+		
+		$returnUserNamesQuery = 'SELECT distinct(username) FROM appointments';
+		
+		$results = $DB->Execute($returnUserNamesQuery);
+		if (!$results) {
+			$err = $DB->ErrorMsg();
+			die($err);
+		}	
+		
+		if ($results->RecordCount() > 0) {
+			while ($row = $results->fetchRow()) {
+				$returnList .= $row['username'].",";
+			}
+		}
+		$returnList = substr($returnList,0,-1);
+		
+		echo $returnList;
+		
+	break;	
+	
+	
+	
 	case "resize":
 		
 		

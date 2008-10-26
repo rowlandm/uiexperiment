@@ -1368,6 +1368,60 @@ require_once('time.lib.php');
 			changeFirstDay: false
 			});
 
+		$('#newUser').keyup(function(e) 
+		{
+			//alert(e.keyCode);
+			if(e.keyCode == 13) {
+				
+				var newUserName = $('#newUser').val();
+				
+				$('#userNameInput').append('<option value="' + newUserName + '">' + newUserName + '</option>');
+				
+				alert(newUserName + ' added to the drop down list ');
+			}
+		});
+		
+		// get distinct list of all users in the database
+		
+		var postData = 'action=returnUserNames';  
+        
+        
+        // initialise the calendar
+		// call ajax from the database to return the records and use them to create events
+  		$.ajax({
+			type: "POST",
+		   	url: "ajaxcal.php",
+		   	data: postData,
+		   	success: function(msg){
+		   		
+				//	<option value=rowland.mosbergen>rowland.mosbergen</option>
+				
+				// rowland.mosbergen,david, new
+				var retrievedUserNames = msg.split(',');
+				
+				if (retrievedUserNames.length > 0 ){
+				
+					for (key in retrievedUserNames){
+		   				$('#userNameInput').append('<option value="' + retrievedUserNames[key] + '">' + retrievedUserNames[key] + '</option>');
+		   			}
+		   		}
+		   		else{
+		   			$('#userNameInput').append('<option value="' + msg + '">' + msg + '</option>');
+		   		}
+		   		
+		   		
+		   		
+		   	}
+		});
+		   		
+		   		
+		$('#userNameInput').change(function () {
+		
+			refreshCalendar($('#showNumDays').val());  
+			
+		});
+
+
 		//initial refresh with 7 days
 		refreshCalendar(7);
 		
@@ -1437,12 +1491,16 @@ li {
 
 <tr>
 	<td>
+		Select users from dropdown list and then select a date.
+		You can add new users in the text field, just then press enter. 
 		<div id=userName>
 			<select id=userNameInput>
-		
-				<option value=rowland.mosbergen>rowland.mosbergen</option>
-				<!--   <option value=corey.evans>corey.evans</option> -->
-				</select>
+				
+					
+					<!--   <option value=corey.evans>corey.evans</option> -->
+			</select>
+			<br>
+			Add new User: <input type=text id=newUser></input>
 		</div>	
 		<div id=inlineDatePicker> 
 			<input type=hidden id=dateChosen></input>
