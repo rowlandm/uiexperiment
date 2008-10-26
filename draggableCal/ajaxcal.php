@@ -236,10 +236,11 @@ switch ($action){
 		$start = $_POST['start']; // eg. 05:45
 		$end = $_POST['end'];  // eg. 22:30
 		$slots = $_POST['slots']; // eg 15 is every 15 minutes
+		$extraDays = $_POST['extraDays'];
 		$format = "24";
 		
 		// die($showNumDays . $start . $end . $slots);
-		
+		//get current local time and day of week
 		$dateToday = getdate();
 		
 		// echo $dateToday[weekday] . '::' . $dateToday[mday] . '::' . $dateToday[wday];
@@ -247,7 +248,11 @@ switch ($action){
 		$daysFromMonday = $dateToday[wday] -1;
 		
 		$date = new DateTime();
-		$date->modify("-" . $daysFromMonday . "day");
+		
+		// go back / forward a week or fortnight or month
+		$date->modify($extraDays . " day");
+		
+		$date->modify("-" . $daysFromMonday . " day");
 		
 		
 		$timeslotArray = timeslotArray($start,$end,$slots,$format);

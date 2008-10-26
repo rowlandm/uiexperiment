@@ -26,10 +26,11 @@ require_once('time.lib.php');
 		var start = '05:45';
 		var end = '22:30';
 		var slots = '15';
+		var extraDays = -7;
 		
 		
 		
-        var postData = 'username='+ $('#userNameInput').val() + '&showNumDays=' + showNumDays  
+        var postData = 'username='+ $('#userNameInput').val() + '&showNumDays=' + showNumDays   + '&extraDays=' + extraDays
         			+ '&start=' + start + '&end=' + end + '&slots=' + slots  + '&action=returnInitialHTML';  
         
         // initialise the calendar
