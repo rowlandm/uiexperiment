@@ -29,7 +29,7 @@ require_once('time.lib.php');
 		
 		
 		
-        var postData = 'action=retrieve&username='+ $('#userNameInput').val() + '&showNumDays=' + showNumDays  
+        var postData = 'username='+ $('#userNameInput').val() + '&showNumDays=' + showNumDays  
         			+ '&start=' + start + '&end=' + end + '&slots=' + slots  + '&action=returnInitialHTML';  
         
         // initialise the calendar
