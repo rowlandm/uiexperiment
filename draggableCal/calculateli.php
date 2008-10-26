@@ -11,6 +11,10 @@ require_once('time.lib.php');
 <script src="jquery-1.2.6.js"></script>
 <script src="jquery-ui-personalized-1.6rc2.min.js"></script>
 <link rel="stylesheet" type="text/css" href="jquery.contextMenu.css" />
+<link rel="stylesheet" type="text/css" href="jquery-ui-themeroller.css" />
+
+
+
 <script type="text/javascript" src="jquery.contextMenu.js"></script>
 <script type="text/javascript" src="json.js"></script> 
 <script>
@@ -26,12 +30,24 @@ require_once('time.lib.php');
 		var start = '05:45';
 		var end = '22:30';
 		var slots = '15';
-		var extraDays = -7;
 		
 		
 		
-        var postData = 'username='+ $('#userNameInput').val() + '&showNumDays=' + showNumDays   + '&extraDays=' + extraDays
+		var dateInWeek = $('#dateChosen').val(); // default to today if none selected in date picker
+		if (dateInWeek == ''){
+			var d = new Date();
+			var curr_date = d.getDate();
+			var curr_month = d.getMonth();
+			curr_month++;
+			var curr_year = d.getFullYear();
+			dateInWeek = curr_date + "-" + curr_month + "-" + curr_year;			
+			
+			
+		}
+		
+		var postData = 'username='+ $('#userNameInput').val() + '&showNumDays=' + showNumDays   + '&dateInWeek=' + dateInWeek
         			+ '&start=' + start + '&end=' + end + '&slots=' + slots  + '&action=returnInitialHTML';  
+        
         
         // initialise the calendar
 		// call ajax from the database to return the records and use them to create events
@@ -42,17 +58,16 @@ require_once('time.lib.php');
 		   	success: function(msg){
 		   		$('#overCalendar').html(msg);
 		   		
+		   		
 		   		refreshCalendarEvents();
-
-				
 				
 		        var collection;
 		
-				$('#refreshDIV').remove();
+				$('#refreshDiv').remove();
 				// radio button to turn refresh on and off when submitting data for events
 				newRadioRefreshHTML = '<div id=refreshDiv><br>Refresh after every action? <br><input type="radio"  name="refreshRadio" value="on"> ON '  
 							+  '<input type="radio"  name="refreshRadio" value="off" checked> OFF <br></div>';
-				$('#overCalendar').prepend(newRadioRefreshHTML);
+				$('#otherChoices').prepend(newRadioRefreshHTML);
 				
 				//alert($('#refreshDiv > :radio:checked').val());
 		
@@ -63,16 +78,19 @@ require_once('time.lib.php');
 										' <input id=showWeeklyView type=submit value="Show Weekly View"> ' + 
 										' <input id=showFortnightlyView type=submit value="Show Fortnightly View"> ' +
 										'</div>';
-				$('#overCalendar').prepend(refreshdaysViewDivHTML);
+				$('#otherChoices').prepend(refreshdaysViewDivHTML);
 				
 				$('#showWeeklyView').click(function(){
 					
 					refreshCalendar(7);
+					$('#showNumDays').val("7");
+					
 					
 				});
 				$('#showFortnightlyView').click(function(){
 				
 					refreshCalendar(14);
+					$('#showNumDays').val("14");
 					
 				});
 				
@@ -1336,6 +1354,20 @@ require_once('time.lib.php');
 
 		$("#hoverPopup").hide();
 
+		$("#inlineDatePicker").datepicker( {
+			dateFormat: "dd-mm-yy",
+			highlightWeek: true,
+			onSelect: function(date) 
+				{         
+					// alert("The chosen date is " + date); 
+					$('#dateChosen').val(date);
+					refreshCalendar($('#showNumDays').val());  
+					
+				},
+			firstDay: 1,     
+			changeFirstDay: false
+			});
+
 		//initial refresh with 7 days
 		refreshCalendar(7);
 		
@@ -1400,18 +1432,39 @@ li {
 <body>
 
 
-<div id=userName><select id=userNameInput>
 
-	<option value=rowland.mosbergen>rowland.mosbergen</option>
-	<!--   <option value=corey.evans>corey.evans</option> -->
-	
-	
+<table>
 
-</select></div>
+<tr>
+	<td>
+		<div id=userName>
+			<select id=userNameInput>
+		
+				<option value=rowland.mosbergen>rowland.mosbergen</option>
+				<!--   <option value=corey.evans>corey.evans</option> -->
+				</select>
+		</div>	
+		<div id=inlineDatePicker> 
+			<input type=hidden id=dateChosen></input>
+		</div>
+		<div id=otherChoices>
+			<input type=hidden id=showNumDays value=7></input>
+		</div>
+	</td>
+	<td>
+		<div id=overCalendar>
 
-<div id=overCalendar>
+		</div>
+	</td>	
+</tr>
+<tr>
+	<td>
+		<div id=overCalendar>
 
-</div>
+		</div>
+	</td>
+</tr>
+</table>
 
 
 

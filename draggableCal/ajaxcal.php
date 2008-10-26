@@ -224,6 +224,7 @@ switch ($action){
 	break;	
 	case "returnInitialHTML":
 		
+		
 		/*
 		$showNumDays = 7;
 		$start = "05:45";
@@ -232,6 +233,8 @@ switch ($action){
 		$format = "24";
 		*/
 		
+		$dateInWeek = $_POST['dateInWeek']; // 23-12-2008
+		
 		$showNumDays = $_POST['showNumDays']; // eg 7 days in a week or 14 for a fortnight
 		$start = $_POST['start']; // eg. 05:45
 		$end = $_POST['end'];  // eg. 22:30
@@ -239,21 +242,23 @@ switch ($action){
 		$extraDays = $_POST['extraDays'];
 		$format = "24";
 		
+		
 		// die($showNumDays . $start . $end . $slots);
 		//get current local time and day of week
-		$dateToday = getdate();
+
 		
-		// echo $dateToday[weekday] . '::' . $dateToday[mday] . '::' . $dateToday[wday];
+		$date = new DateTime($dateInWeek);
+
 		
-		$daysFromMonday = $dateToday[wday] -1;
+		// if today is monday then leave
 		
-		$date = new DateTime();
 		
-		// go back / forward a week or fortnight or month
-		$date->modify($extraDays . " day");
+		// if today is not monday then revert back to last monday
+		$date->modify("+1 day");
+		$date->modify("last Monday");
 		
-		$date->modify("-" . $daysFromMonday . " day");
 		
+		// die($date->format('ld-m-Y') . '::' . $showNumDays);
 		
 		$timeslotArray = timeslotArray($start,$end,$slots,$format);
 		
@@ -263,7 +268,8 @@ switch ($action){
 				
 		
 		for ($count = 0;$count < $showNumDays;$count++ ){
-
+			
+			
 			
 			$returnInitialHTML.= '<td>'. $date->format("l") . '<br>'.$date->format("d-m-Y");
 	
