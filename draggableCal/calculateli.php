@@ -57,7 +57,6 @@ require_once('time.lib.php');
 		   	success: function(msg){
 		   		$('#overCalendar').html(msg);
 		   		
-		   		
 		   		refreshCalendarEvents();
 				
 		        var collection;
@@ -74,10 +73,19 @@ require_once('time.lib.php');
 				// radio button to choose week or fortnight View
 				$('#refreshdaysViewDiv').remove();
 				refreshdaysViewDivHTML = '<div id=refreshdaysViewDiv> ' +
-										' <input id=showWeeklyView type=submit value="Show Weekly View"> ' + 
+										' <input id=showDailyView type=submit value="Show Daily View"> <br>' +
+										' <input id=showWeeklyView type=submit value="Show Weekly View"> <br>' + 
 										' <input id=showFortnightlyView type=submit value="Show Fortnightly View"> ' +
 										'</div>';
 				$('#otherChoices').prepend(refreshdaysViewDivHTML);
+
+				$('#showDailyView').click(function(){
+					
+					refreshCalendar(1);
+					$('#showNumDays').val("1");
+					
+					
+				});
 				
 				$('#showWeeklyView').click(function(){
 					
@@ -1427,8 +1435,8 @@ require_once('time.lib.php');
 		});
 
 
-		//initial refresh with 7 days
-		refreshCalendar(7);
+		//initial refresh with 1 days
+		refreshCalendar(1);
 		
   	});
   	</script>
