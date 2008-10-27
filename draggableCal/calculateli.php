@@ -467,9 +467,9 @@ require_once('time.lib.php');
         // remove divs with class of savedDiv and then remove the li.saved items to refresh
         $('#overCalendar > div').filter('.savedDiv').remove();
         
-        $('#overCalendar > li').filter('.saved').removeClass().addClass('ui-selectee').addClass('ui-droppable')
-        .css("background","").css("color","").css("border-bottom","").css("height","");
         
+        $('li.saved').removeClass().addClass('ui-selectee').addClass('ui-droppable')
+        .removeAttr("style");
         
         
         // want to return the monday date so that we can populate the entire week
