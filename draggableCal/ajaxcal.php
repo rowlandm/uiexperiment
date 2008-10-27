@@ -145,7 +145,7 @@ switch ($action){
 		
 		// end date is +7 days and - 1 second
 		$sundayDate = new DateTime($mondayDate);
-		$sundayDate->modify("+".$showNumDays." day");
+		$sundayDate->modify("+". ($showNumDays - 1) ." day");
 		
 		$end = $sundayDate->format('Y-m-d') . ' 23:59:59';
 		
@@ -156,7 +156,7 @@ switch ($action){
 		
 		$queryAppointments = 'username="' . $username . '" AND appt_start >= "' . $start . '" AND appt_start <= "' . $end . '"';
 		
-		// die($queryAppointments);
+		// die($showNumDays . '::' . $queryAppointments);
 		
 		$returnAppointmentsArray = $returnAppointments->Find($queryAppointments);
 		

@@ -14,7 +14,6 @@ require_once('time.lib.php');
 <link rel="stylesheet" type="text/css" href="jquery-ui-themeroller.css" />
 
 
-
 <script type="text/javascript" src="jquery.contextMenu.js"></script>
 <script type="text/javascript" src="json.js"></script> 
 <script>
@@ -478,8 +477,9 @@ require_once('time.lib.php');
         // .attr(id) gets the actual id eg. timeslotsMonday20-10-2008
         // split puts it into an array with day as the delimiter. so mondayDate[1] should have the date for the monday
         var mondayDate = $('ul[id*="timeslotsMonday"]').attr('id').split('day');
+        var showNumDays = $('#showNumDays').val();
         
-        var postData = 'action=retrieve&username='+ $('#userNameInput').val() + '&mondayDate=' + mondayDate[1] + '&showNumDays=14' ;  
+        var postData = 'action=retrieve&username='+ $('#userNameInput').val() + '&mondayDate=' + mondayDate[1] + '&showNumDays=' + showNumDays ;  
         
         // initialise the calendar
 		// call ajax from the database to return the records and use them to create events
@@ -949,7 +949,11 @@ require_once('time.lib.php');
                     
 		// get the position of the first element so we can stick the div directly on top of it
 		var offset = collection.eq(0).offset();
-		var newHeight = (count * 15) - 2; // the 15 is for the height of each li and the -2 is to take into account the 2px bottom line
+		
+		// the 15 is for the height of each li and the -2 is to take into account the 2px bottom line -- Firefox and chrome
+		var newHeight = (count * 15) - 2; 
+		
+		
 		var newDivSave = '<div id="' + parent + txtStart + '" class = "savedDiv" >';
                     
                     
@@ -961,7 +965,6 @@ require_once('time.lib.php');
 					+ end + ';' + count * 0.25 + ';' + count + ';' + parent + ';' 
 					+ inputType + ';' + inputCode+ ';' + inputDetails + '</span>'; 
 		newDivSave = newDivSave + '</div>';	
-                    
                     
                     
 		// append the new div	                    	
@@ -1286,8 +1289,10 @@ require_once('time.lib.php');
 	                // now reset this back to what it used to be
     	            // removing classes that were used when saving the block
     	            // remove the .css by setting the attribute to blank
-        	        $(this).removeClass('saved').removeClass(txtStart).css("background","").css("color","").css("border-bottom","").css("height","");
+        	        $(this).removeClass('saved').removeClass(txtStart)
+        	        	.removeAttr("style");
         	        
+        	        // .css("background","").css("color","").css("border-bottom","").css("height","")
 	
         	        
                 });		
@@ -1434,6 +1439,7 @@ ul {
 	list-style: none;
 	margin: 0px;
 	padding: 0px;
+	width: 100px;
 }
 
 .ui-selected {
@@ -1453,27 +1459,20 @@ ul {
 	width: 100px;
 }
 
+
+
 li {
 	border-bottom: 2px solid black;
 	background: #CFD4E6;
 	height: 10px;
-	width: 100px;
+	
 	margin-top: 0px;
 	font-size: 9px;
 	font-family: Arial;
 	padding-top: 3px;
-}
-
-<?php
- //Detect if user 's browser is IE,if so,include IE hack to improve CSS Standards compliency
- $user_agent  = isset ($_SERVER[ 'HTTP_USER_AGENT '] )  ? $_SERVER[ 'HTTP_USER_AGENT
-	']  : ''; if (strpos($user_agent, 'MSIE ')  !== false ) {echo "li
-	{margin-top:-1px;
 	
 }
-";
-}
-?>
+
 </style>
 <style>
 .proxy {
