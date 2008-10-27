@@ -1465,7 +1465,7 @@ li {
 	border-bottom: 2px solid black;
 	background: #CFD4E6;
 	height: 10px;
-	
+	line-height:12px;
 	margin-top: 0px;
 	font-size: 9px;
 	font-family: Arial;
