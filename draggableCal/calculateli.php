@@ -73,20 +73,11 @@ require_once('time.lib.php');
 				// radio button to choose week or fortnight View
 				$('#refreshdaysViewDiv').remove();
 				refreshdaysViewDivHTML = '<div id=refreshdaysViewDiv> ' +
-										' <input id=showDailyView type=submit value="Show Daily View"> <br>' +
 										' <input id=showWeeklyView type=submit value="Show Weekly View"> <br>' + 
 										' <input id=showFortnightlyView type=submit value="Show Fortnightly View"> ' +
 										'</div>';
 				$('#otherChoices').prepend(refreshdaysViewDivHTML);
 
-				$('#showDailyView').click(function(){
-					
-					refreshCalendar(1);
-					$('#showNumDays').val("1");
-					
-					
-				});
-				
 				$('#showWeeklyView').click(function(){
 					
 					refreshCalendar(7);
@@ -118,7 +109,7 @@ require_once('time.lib.php');
 		        
 		          
 		        // This is to set all ul tags that are in the overCalendar DIV to be selectable - includes li tags too
-		       	$('ul').selectable({
+		       	$('#overCalendar ul').selectable({
 		       	
 		       		// this is what to do when you are selecting
 		       		// want to stop li's with class of saved from being selected
@@ -309,7 +300,7 @@ require_once('time.lib.php');
 		         
 		         
 		        // this is to allow the draggable to drop into something 
-				$("li").droppable({ 
+				$("#overCalendar li").droppable({ 
 				
 					// only accept savedDiv class objects
 				    accept: ".savedDiv", 
@@ -455,7 +446,7 @@ require_once('time.lib.php');
 					 
 				    // clear out any addClass('moved') that was set
 				    // regardless of failure or not
-					$("* > .moved").removeClass('moved');
+					$("#overCalendar .moved").removeClass('moved');
 				        
 				    }  
 				});         
@@ -476,7 +467,7 @@ require_once('time.lib.php');
         $('#overCalendar > div').filter('.savedDiv').remove();
         
         
-        $('li.saved').removeClass().addClass('ui-selectee').addClass('ui-droppable')
+        $('#overCalendar li.saved').removeClass().addClass('ui-selectee').addClass('ui-droppable')
         .removeAttr("style");
         
         
@@ -484,7 +475,7 @@ require_once('time.lib.php');
         // $('ul[id*="timeslotsMonday"]') says get all ul's that have an id that contains timeSlotsMonday
         // .attr(id) gets the actual id eg. timeslotsMonday20-10-2008
         // split puts it into an array with day as the delimiter. so mondayDate[1] should have the date for the monday
-        var mondayDate = $('ul[id*="timeslotsMonday"]').attr('id').split('day');
+        var mondayDate = $('#overCalendar ul[id*="timeslotsMonday"]').attr('id').split('day');
         var showNumDays = $('#showNumDays').val();
         
         var postData = 'action=retrieve&username='+ $('#userNameInput').val() + '&mondayDate=' + mondayDate[1] + '&showNumDays=' + showNumDays ;  
@@ -917,7 +908,8 @@ require_once('time.lib.php');
 		
 		
 		// regardless of anything else, remove all classed of resized
-		$("* > .resized").removeClass('resized');
+		$("#overCalendar .resized").removeClass('resized');
+		
 	} //  stopResizing	
   	
   	function setSelectedElementsToSave (action,collection,name,inputType,inputCode,inputDetails){
@@ -1435,8 +1427,8 @@ require_once('time.lib.php');
 		});
 
 
-		//initial refresh with 1 days
-		refreshCalendar(1);
+		//initial refresh with 7 days
+		refreshCalendar(7);
 		
   	});
   	</script>
