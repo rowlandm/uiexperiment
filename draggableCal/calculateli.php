@@ -917,7 +917,9 @@ require_once('time.lib.php');
 		else {
 			// reset the height back to the old height
 			var oldHeight = ui.originalSize.height - 2;
-			ui.element.height( oldHeight + 'px');
+			// for some reason the css background green got lost
+			ui.element.height( oldHeight + 'px').css("background","green");
+			
 			
 		} 
 		
