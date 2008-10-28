@@ -30,29 +30,33 @@ $_SESSION[$sessionID] = $sessionID;
   		// actionDayChosen is tuesday24-10-2008
   		var emailToAddress = prompt("Which email address would you like it sent to?","katina.omeros@celentia.com");
   		// var emailToAddress = prompt("Which email address would you like it sent to?","rowland.mosbergen@gmail.com");
-  		var emailDefault = $('#userNameInput').val() + '@celentia.com';
-  		var emailFromAddress = prompt("Which email address would you like it sent from?",emailDefault);
-
-		// eg. OVH:9 hours;GCMIA:4 hours;
-		var details = calculateTotals(actionDayChosen,el,false);
-
-		if ( (emailToAddress != null) && (emailFromAddress != null) ){
-				
-			var postData = 'emailFromAddress=' + emailFromAddress + '&dataDetails=' + details  + '&emailToAddress=' + emailToAddress   + '&actionDayChosen=' + actionDayChosen
-	        			 + '&action=emailDaily' + '&sessionid=<?php echo $sessionID ?>';  
+  		
+  		if (emailToAddress != null) {
+  		
+	  		var emailDefault = $('#userNameInput').val() + '@celentia.com';
+	  		var emailFromAddress = prompt("Which email address would you like it sent from?",emailDefault);
 	
-			// $('#overCalendar').append(postData);
-			
-			$.ajax({
-				type: "POST",
-			   	url: "ajaxcal.php",
-			   	data: postData,
-			   	success: function(msg){
-					alert(msg);   		
-	  			}
-	  		});
-	  		
-		} // if not null  		
+			// eg. OVH:9 hours;GCMIA:4 hours;
+			var details = calculateTotals(actionDayChosen,el,false);
+
+			if (emailFromAddress != null) {
+					
+				var postData = 'emailFromAddress=' + emailFromAddress + '&dataDetails=' + details  + '&emailToAddress=' + emailToAddress   + '&actionDayChosen=' + actionDayChosen
+		        			 + '&action=emailDaily' + '&sessionid=<?php echo $sessionID ?>';  
+		
+				// $('#overCalendar').append(postData);
+				
+				$.ajax({
+					type: "POST",
+				   	url: "ajaxcal.php",
+				   	data: postData,
+				   	success: function(msg){
+						alert(msg);   		
+		  			}
+		  		});
+		  		
+			} // if emailFromAddress not null  	
+		} // if emailToaddress not null 	
   	
   	}
   	
@@ -121,6 +125,7 @@ $_SESSION[$sessionID] = $sessionID;
 					
 					refreshCalendar(7);
 					$('#showNumDays').val("7");
+					$('#weeklyTotals').text('Weekly Totals');
 					
 					
 				});
@@ -128,6 +133,8 @@ $_SESSION[$sessionID] = $sessionID;
 				
 					refreshCalendar(14);
 					$('#showNumDays').val("14");
+					
+					$('#weeklyTotals').text('F/n Totals');
 					
 				});
 				
@@ -1611,7 +1618,7 @@ li {
 <ul id="savedDivMenu" class="contextMenu">
 	<li class="showDetails"><a href="#showDetails">Show Details</a></li>
 	<li class="dailyTotals"><a href="#dailyTotals">Daily Totals</a></li>
-	<li class="weeklyTotals"><a href="#weeklyTotals">Weekly Totals</a></li>
+	<li class="weeklyTotals"><a id=weeklyTotals href="#weeklyTotals">Weekly Totals</a></li>
 	<li class="edit"><a href="#edit">Edit</a></li>
 	<li class="refresh" id=refreshMenu><a href="#refresh">Refresh</a></li>
 	<li class="emailDaily" ><a href="#emailDaily">Email Daily</a></li>
