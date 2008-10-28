@@ -27,7 +27,7 @@ require_once('time.lib.php');
 		*/
 		
 		var start = '05:45';
-		var end = '22:30';
+		var end = '18:00';
 		var slots = '15';
 		
 		
