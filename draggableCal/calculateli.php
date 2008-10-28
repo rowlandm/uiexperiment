@@ -36,21 +36,23 @@ $_SESSION[$sessionID] = $sessionID;
 		// eg. OVH:9 hours;GCMIA:4 hours;
 		var details = calculateTotals(actionDayChosen,el,false);
 
+		if ( (emailToAddress != null) && (emailFromAddress != null) ){
 				
-		var postData = 'emailFromAddress=' + emailFromAddress + '&dataDetails=' + details  + '&emailToAddress=' + emailToAddress   + '&actionDayChosen=' + actionDayChosen
-        			 + '&action=emailDaily' + '&sessionid=<?php echo $sessionID ?>';  
-
-		// $('#overCalendar').append(postData);
-		
-		$.ajax({
-			type: "POST",
-		   	url: "ajaxcal.php",
-		   	data: postData,
-		   	success: function(msg){
-				alert(msg);   		
-  			}
-  		});
-  		
+			var postData = 'emailFromAddress=' + emailFromAddress + '&dataDetails=' + details  + '&emailToAddress=' + emailToAddress   + '&actionDayChosen=' + actionDayChosen
+	        			 + '&action=emailDaily' + '&sessionid=<?php echo $sessionID ?>';  
+	
+			// $('#overCalendar').append(postData);
+			
+			$.ajax({
+				type: "POST",
+			   	url: "ajaxcal.php",
+			   	data: postData,
+			   	success: function(msg){
+					alert(msg);   		
+	  			}
+	  		});
+	  		
+		} // if not null  		
   	
   	}
   	
