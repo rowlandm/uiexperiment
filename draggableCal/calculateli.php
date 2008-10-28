@@ -1,6 +1,13 @@
 <?php
 require_once('time.lib.php');
 
+session_start();
+
+$sessionID = session_id();
+
+$_SESSION[$sessionID] = $sessionID;
+
+
 //temp, 2b filled from db
 //$blockedArray = array("10:30","13:00")
 ?>
@@ -17,6 +24,36 @@ require_once('time.lib.php');
 <script type="text/javascript" src="jquery.contextMenu.js"></script>
 <script type="text/javascript" src="json.js"></script> 
 <script>
+  	
+  	function sendEmailDaily(actionDayChosen,el){
+  	
+  		// actionDayChosen is tuesday24-10-2008
+  		var emailToAddress = prompt("Which email address would you like it sent to?","katina.omeros@celentia.com");
+  		// var emailToAddress = prompt("Which email address would you like it sent to?","rowland.mosbergen@gmail.com");
+  		var emailDefault = $('#userNameInput').val() + '@celentia.com';
+  		var emailFromAddress = prompt("Which email address would you like it sent from?",emailDefault);
+
+		// eg. OVH:9 hours;GCMIA:4 hours;
+		var details = calculateTotals(actionDayChosen,el,false);
+
+				
+		var postData = 'emailFromAddress=' + emailFromAddress + '&dataDetails=' + details  + '&emailToAddress=' + emailToAddress   + '&actionDayChosen=' + actionDayChosen
+        			 + '&action=emailDaily' + '&sessionid=<?php echo $sessionID ?>';  
+
+		// $('#overCalendar').append(postData);
+		
+		$.ajax({
+			type: "POST",
+		   	url: "ajaxcal.php",
+		   	data: postData,
+		   	success: function(msg){
+				alert(msg);   		
+  			}
+  		});
+  		
+  	
+  	}
+  	
   	
 	function refreshCalendar(showNumDays){
 		/*
@@ -1068,14 +1105,14 @@ require_once('time.lib.php');
 				// var actionDayChosen = "Tuesday";
 							 
 				// alert(actionDayChosen);
-				calculateTotals(actionDayChosen,el);
+				calculateTotals(actionDayChosen,el,true);
 														
 			}		
 			if (action == "weeklyTotals"){
 							
 							
 				// alert(actionDayChosen);
-				calculateTotals('weekly',el);
+				calculateTotals('weekly',el,true);
 														
 			}	
 			if (action == "refresh"){
@@ -1087,6 +1124,18 @@ require_once('time.lib.php');
 					editSavedDiv(el,pos);
 		
 			}
+			if (action == "emailDaily"){
+
+				// id is timeslotsTuesday24-10-200806-00							
+				// var actionDayChosen = "Tuesday24-10-2008";
+				 						
+				var actionDayChosen = el.attr('id').slice(9,-5);
+							 
+				// alert(actionDayChosen);
+				sendEmailDaily(actionDayChosen,el);
+														
+			}		
+			
 			
 			
 			if (action == "showDetails"){
@@ -1170,7 +1219,7 @@ require_once('time.lib.php');
   	
   	}
   	
-  	function calculateTotals (dayChosen,el){
+  	function calculateTotals (dayChosen,el,display){
 		
 		// i have set hidden spans that have the day in the id
 		// eg. span id =  timeSlotsMonday07-45data
@@ -1215,44 +1264,54 @@ require_once('time.lib.php');
 		$("#showTotals").remove();
 		
 
-
+		if (display){
 		
-		var newDivTotals = '<div id="showTotals" style="position:absolute; background:black; color:white" >';
-		newDivTotals = newDivTotals + '<table bgcolor="#0000FF">';
-		newDivTotals = newDivTotals + '<tr><td id=titleTotals color="#FFFFFF">Details</td></tr>';
-		newDivTotals = newDivTotals + '<tr><td id=textTotals bgcolor="#8888FF">Hello I am a popup table</td></tr></table></div>';
-		$("#overCalendar").append(newDivTotals);  
-		
-		if (dayChosen == 'weekly'){
-			$("#titleTotals").text(" Weekly Total ");
-		}
-		else{ 
-			$("#titleTotals").text(" Total for " + dayChosen);
-		}
-		
-		 
-		var textTotals = '<table>';
-		for (key in totals){
-			textTotals = textTotals + '<tr><td>' +  key + ":" + totals[key] + "</td></tr>";
-		}		
-		
-		textTotals = textTotals + "<tr><td> Please click to hide.</td></tr></table>";
-		
-		$("#textTotals").html(textTotals);
+			var newDivTotals = '<div id="showTotals" style="position:absolute; background:black; color:white" >';
+			newDivTotals = newDivTotals + '<table bgcolor="#0000FF">';
+			newDivTotals = newDivTotals + '<tr><td id=titleTotals color="#FFFFFF">Details</td></tr>';
+			newDivTotals = newDivTotals + '<tr><td id=textTotals bgcolor="#8888FF">Hello I am a popup table</td></tr></table></div>';
+			$("#overCalendar").append(newDivTotals);  
 			
+			if (dayChosen == 'weekly'){
+				$("#titleTotals").text(" Weekly Total ");
+			}
+			else{ 
+				$("#titleTotals").text(" Total for " + dayChosen);
+			}
+			
+			 
+			var textTotals = '<table>';
+			for (key in totals){
+				textTotals = textTotals + '<tr><td>' +  key + ":" + totals[key] + " hours</td></tr>";
+			}		
+			
+			textTotals = textTotals + "<tr><td> Please click to hide.</td></tr></table>";
+			
+			$("#textTotals").html(textTotals);
+				
+			
+			var offset = el.offset();
+			
+			
+			
+			var topOffset = offset.top + 18; 
+			var leftOffset = offset.left + 18;
+			
+			$("#showTotals").show().css("top",topOffset).css("left",leftOffset)
+			.click(function(){
+				$("#showTotals").hide();	
+			})
 		
-		var offset = el.offset();
+		} // display
+		else {
+			var returnTotals = '';
+			
+			for (key in totals){
+				returnTotals = returnTotals + key + ":" + totals[key] + " hours;";
+			}		
 		
-		
-		
-		var topOffset = offset.top + 18; 
-		var leftOffset = offset.left + 18;
-		
-		$("#showTotals").show().css("top",topOffset).css("left",leftOffset)
-		.click(function(){
-			$("#showTotals").hide();	
-		})
-		
+			return returnTotals;
+		}
 																			
 		
 	}
@@ -1553,6 +1612,7 @@ li {
 	<li class="weeklyTotals"><a href="#weeklyTotals">Weekly Totals</a></li>
 	<li class="edit"><a href="#edit">Edit</a></li>
 	<li class="refresh" id=refreshMenu><a href="#refresh">Refresh</a></li>
+	<li class="emailDaily" ><a href="#emailDaily">Email Daily</a></li>
 	<li class="delete"><a href="#delete">Delete</a></li>
 	<li class="quit separator"><a href="#quit">Quit</a></li>
 </ul>
