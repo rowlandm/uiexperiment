@@ -1000,7 +1000,6 @@ require_once('time.lib.php');
 		})
 		.resizable({
 			handles: "s",
-			transparent: true,
 			helper: "proxy",
 			grid: [0,5],
 			containment: $('#overCalendar'),
