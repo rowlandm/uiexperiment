@@ -109,6 +109,10 @@ require_once('time.lib.php');
 		        
 		          
 		        // This is to set all ul tags that are in the overCalendar DIV to be selectable - includes li tags too
+		        
+		        // for speed, try to find the lowest level element to reduce time finding that element
+		        // #overCalendar ul means show all ul elements that are descendants of #overCalendar DIV
+		        // #overCalendar > ul didn't work - this is all ul elements that are children of #overCalendar DIV
 		       	$('#overCalendar ul').selectable({
 		       	
 		       		// this is what to do when you are selecting
@@ -299,7 +303,11 @@ require_once('time.lib.php');
 		
 		         
 		         
-		        // this is to allow the draggable to drop into something 
+		        // this is to allow the draggable to drop into something
+		        
+		        // for speed, try to find the lowest level element to reduce time finding that element
+		        // #overCalendar li means show all li elements that are descendants of #overCalendar DIV
+		        // #overCalendar > li didn't work - this is all li elements that are children of #overCalendar DIV		         
 				$("#overCalendar li").droppable({ 
 				
 					// only accept savedDiv class objects
@@ -446,6 +454,9 @@ require_once('time.lib.php');
 					 
 				    // clear out any addClass('moved') that was set
 				    // regardless of failure or not
+				    
+				    // for speed, try to find the lowest level element to reduce time finding that element
+				    // hence find all class of moved that is a descendant of #overCalendar
 					$("#overCalendar .moved").removeClass('moved');
 				        
 				    }  
@@ -466,6 +477,9 @@ require_once('time.lib.php');
         // remove divs with class of savedDiv and then remove the li.saved items to refresh
         $('#overCalendar > div').filter('.savedDiv').remove();
         
+        // for speed, try to find the lowest level element to reduce time finding that element
+        // #overCalendar li.saved means show all li elements with a class of saved that are descendants of #overCalendar DIV
+        // #overCalendar > li.saved  didn't work - this is all li elements that are children of #overCalendar DIV		         
         
         $('#overCalendar li.saved').removeClass().addClass('ui-selectee').addClass('ui-droppable')
         .removeAttr("style");
@@ -475,6 +489,8 @@ require_once('time.lib.php');
         // $('ul[id*="timeslotsMonday"]') says get all ul's that have an id that contains timeSlotsMonday
         // .attr(id) gets the actual id eg. timeslotsMonday20-10-2008
         // split puts it into an array with day as the delimiter. so mondayDate[1] should have the date for the monday
+        
+        // for speed, try to find the lowest level element to reduce time finding that element - hence #overCalendar ul[id*="timeslotsMonday"]
         var mondayDate = $('#overCalendar ul[id*="timeslotsMonday"]').attr('id').split('day');
         var showNumDays = $('#showNumDays').val();
         
@@ -908,6 +924,8 @@ require_once('time.lib.php');
 		
 		
 		// regardless of anything else, remove all classed of resized
+		
+		// increase speed by finding smallest element before searching for classes
 		$("#overCalendar .resized").removeClass('resized');
 		
 	} //  stopResizing	
@@ -999,6 +1017,8 @@ require_once('time.lib.php');
 				    
 		})
 		.resizable({
+		
+			// had to hide transparent: true as it stopped ie7 from resizing probably due to the bottom line etc.
 			handles: "s",
 			helper: "proxy",
 			grid: [0,5],
