@@ -281,7 +281,7 @@ $_SESSION[$sessionID] = $sessionID;
 									
 									$('#inputDivTitle').text('Add new appointment');
 		
-									$("#inputDiv").show().css("width","500px")
+									$("#inputDiv").show().css("width","500px").draggable()
 									.css("top",topOffset).css("left",leftOffset);
 																
 									$('#cancelSubmit').click(function(){
@@ -1164,8 +1164,8 @@ $_SESSION[$sessionID] = $sessionID;
 				var topOffset = offset.top + 18; 
 				var leftOffset = offset.left + 18;
 							
-				$("#hoverPopup").show().css("top",topOffset).css("left",leftOffset)
-				.click(function(){
+				$("#hoverPopup").show().css("top",topOffset).css("left",leftOffset).draggable()
+				.dblclick(function(){
 					$("#hoverPopup").hide();	
 				});
 							
@@ -1294,7 +1294,7 @@ $_SESSION[$sessionID] = $sessionID;
 				textTotals = textTotals + '<tr><td>' +  key + ":" + totals[key] + " hours</td></tr>";
 			}		
 			
-			textTotals = textTotals + "<tr><td> Please click to hide.</td></tr></table>";
+			textTotals = textTotals + "<tr><td> Please double click to hide.</td></tr></table>";
 			
 			$("#textTotals").html(textTotals);
 				
@@ -1306,8 +1306,8 @@ $_SESSION[$sessionID] = $sessionID;
 			var topOffset = offset.top + 18; 
 			var leftOffset = offset.left + 18;
 			
-			$("#showTotals").show().css("top",topOffset).css("left",leftOffset)
-			.click(function(){
+			$("#showTotals").draggable().show().css("top",topOffset).css("left",leftOffset)
+			.dblclick(function(){
 				$("#showTotals").hide();	
 			})
 		
