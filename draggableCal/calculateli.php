@@ -1169,7 +1169,7 @@ $_SESSION[$sessionID] = $sessionID;
 					$("#hoverPopup").hide();	
 				});
 							
-				$("#textPopup").append("<br> Click to hide");																	
+				$("#textPopup").append("<br> Double click to hide");																	
 			}	
 			
 			if (action == "delete"){
