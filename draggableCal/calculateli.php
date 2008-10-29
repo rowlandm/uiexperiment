@@ -632,7 +632,7 @@ $_SESSION[$sessionID] = $sessionID;
 			' </table></div> ';
 			
 			$('#overCalendar').append(newInputDiv);
-    		$('#inputDiv').hide();
+    		$('#inputDiv').hide().draggable();
     		
     		$('#inputName').val(spanValues[0]);
     		$('#inputType').val(spanValues[6]);
