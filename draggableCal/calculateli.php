@@ -277,7 +277,7 @@ $_SESSION[$sessionID] = $sessionID;
 		
 												
 									var topOffset  = e.pageY  - 100; 
-									var leftOffset = e.pageX + 18 ; 
+									var leftOffset = e.pageX - 100; 
 									
 									$('#inputDivTitle').text('Add new appointment');
 		
@@ -662,7 +662,7 @@ $_SESSION[$sessionID] = $sessionID;
 			
 						
 			var topOffset  = pos.docY + 8; 
-			var leftOffset = pos.docX + 8 ; 
+			var leftOffset = pos.docX -100; 
 			
 			$('#inputDivTitle').text('Add new appointment');
 
