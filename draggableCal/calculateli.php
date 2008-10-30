@@ -688,7 +688,30 @@ $_SESSION[$sessionID] = $sessionID;
 				+ ';' + spanValues[4] + ';' + spanValues[5] + ';' + spanValues[6] + ';' + spanValues[7] + ';' + spanValues[8]);					
 				
 				// change the display
-				$('#' + el.attr('id') + 'display').text(spanValues[0] + ' Duration: ' + spanValues[3]);  
+				$('#' + el.attr('id') + 'display').text(spanValues[0] + ' Duration: ' + spanValues[3]);
+				
+				
+				var postData = 'username=' + $('#userNameInput').val() + '&htmlID=' + el.attr('id')
+								+ '&action=edit' + '&inputName=' +  spanValues[0] + '&inputType=' + spanValues[6] 
+								+ '&inputCode=' + spanValues[7] + '&inputDetails=' + spanValues[8];
+				
+		          
+		        
+		        // initialise the calendar
+				// call ajax from the database to return the records and use them to create events
+		  		$.ajax({
+					type: "POST",
+				   	url: "ajaxcal.php",
+				   	data: postData,
+				   	success: function(msg){
+				   	
+				   		alert(msg);
+				   	}
+				   	
+				});		
+				   	
+				   			
+				  
 				
 			});			
 	} //function editSavedDiv

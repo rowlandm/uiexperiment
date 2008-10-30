@@ -360,7 +360,25 @@ switch ($action){
 		
 		
 	break;
-	
+	case "edit":
+
+		
+		$inputName = $_POST['inputName'];
+		$htmlID = $_POST['htmlID']; // format timeslotsThursday23-10-200809:30
+		$inputType = $_POST['inputType'];
+		$inputCode = $_POST['inputCode'];
+		$inputDetails = $_POST['inputDetails'];
+		
+		
+		$editQuery = 'UPDATE appointments SET appt_name = "'.$inputName.'",appt_code = "'.$inputCode.'",appt_type = "'.$inputType.'",appt_details = "'.$inputDetails.'" WHERE username = "' . $username . '" AND htmlid = "' . $htmlID . '"';
+		
+		$ok = $DB->Execute($editQuery);
+		if (!$ok) {
+			$err = $DB->ErrorMsg();
+			die($err);
+		}	
+		echo 'SUCCESS: edited successfully.'; 
+	break;		
 	
 }
 

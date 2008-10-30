@@ -99,6 +99,8 @@ $_SESSION[$sessionID] = $sessionID;
         
         // initialise the calendar
 		// call ajax from the database to return the records and use them to create events
+  		
+  		
   		$.ajax({
 			type: "POST",
 		   	url: "ajaxcal.php",
@@ -351,7 +353,7 @@ $_SESSION[$sessionID] = $sessionID;
 		            }				
 		
 		         });    	
-		
+					
 				Jiffy.measure("over Calendar > ul selectable", "refreshCalendar");
 		
 		
@@ -561,6 +563,9 @@ $_SESSION[$sessionID] = $sessionID;
         
         var postData = 'action=retrieve&username='+ $('#userNameInput').val() + '&mondayDate=' + mondayDate[1] + '&showNumDays=' + showNumDays ;  
         
+        
+        Jiffy.measure("just before ajax call", "refreshCalendarEvents");
+        
         // initialise the calendar
 		// call ajax from the database to return the records and use them to create events
   		$.ajax({
@@ -570,7 +575,8 @@ $_SESSION[$sessionID] = $sessionID;
 		   	success: function(msg){
 		   	
 		   		Jiffy.measure("ajax success start ", "refreshCalendarEvents");
-		   	
+		   		
+		   		
 		   		// debug code
 		   		// $('#overCalendar > span:last').remove();
 		    	// $('#overCalendar').append('<span>'  + msg + '</span>');
@@ -604,7 +610,8 @@ $_SESSION[$sessionID] = $sessionID;
 						}
 					
 					});
-				
+					// Jiffy.measure("finish resetting teh li's", "refreshCalendarEvents");
+					
 					// now just do a collection for this object and call the details
 					
 					var collection = jQuery('li.ui-selected:visible');
@@ -1092,6 +1099,7 @@ $_SESSION[$sessionID] = $sessionID;
 			grid: 	[102,1]
 				    
 		})
+		
 		.resizable({
 		
 			// had to hide transparent: true as it stopped ie7 from resizing probably due to the bottom line etc.
@@ -1108,17 +1116,7 @@ $_SESSION[$sessionID] = $sessionID;
 			
 			
 
-		})
-		// set to delete if double clicked
-		.dblclick(function () { 
-		
-		  	var delSaved = confirm("Do you wish to delete?");
-  		
-  		
-  			if (delSaved){
-				deleteSavedDiv($(this));
-			}
-		})
+		})	
 		// show menu when Right Mouse Clicked
 		.contextMenu({
 			menu: 'savedDivMenu',
@@ -1210,7 +1208,19 @@ $_SESSION[$sessionID] = $sessionID;
 				}	
 			}
 							
-		});
+		})
+		// set to delete if double clicked
+		.dblclick(function () { 
+		
+		  	var delSaved = confirm("Do you wish to delete?");
+  		
+  		
+  			if (delSaved){
+				deleteSavedDiv($(this));
+			}
+		})
+		// show menu when Right Mouse Clicked
+		;
   	
   		// now save this into the database
   		Jiffy.measure("finish setting div up","setSelectedElementsToSave");
