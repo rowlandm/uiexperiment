@@ -572,16 +572,21 @@ $_SESSION[$sessionID] = $sessionID;
 
 					
 					
-					// mark all the appropriate li's as class 'ui-selected'
-					$('#'+ parent + ' > li:contains("' + start + '")').addClass('ui-selected')
-					.nextAll().each(function (i){
-					
-						$(this).addClass('ui-selected');
-						if ($(this).text() == end){
-							return false;
-						}
-					
-					});
+					if (start == end){
+						$('#'+ parent + ' > li:contains("' + start + '")').addClass('ui-selected');
+					}
+					else {
+						// mark all the appropriate li's as class 'ui-selected'
+						$('#'+ parent + ' > li:contains("' + start + '")').addClass('ui-selected')
+						.nextAll().each(function (i){
+						
+							$(this).addClass('ui-selected');
+							if ($(this).text() == end){
+								return false;
+							}
+						
+						});
+					} // end of else if start == end
 				
 					// now just do a collection for this object and call the details
 					
