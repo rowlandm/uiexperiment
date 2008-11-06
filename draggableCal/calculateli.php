@@ -1272,6 +1272,8 @@ $_SESSION[$sessionID] = $sessionID;
 			collection = jQuery("span[id*='data'][id*='" + dayChosen +  "']");
 		} 
 		
+		var weeklyOverallTotal = 0;
+		
 		var totals  = new Array();
 		collection.each(function(){
 		
@@ -1281,6 +1283,8 @@ $_SESSION[$sessionID] = $sessionID;
 			// the job code is set to the 8th element of the span
 			var key = spanValues[7];
 			var value = spanValues[3];
+			
+			
 			
 			// name  and time in hours
 			// alert(spanValues[0] + ' ; ' + spanValues[3]);
@@ -1292,7 +1296,7 @@ $_SESSION[$sessionID] = $sessionID;
 			
 			
 			totals[key] = totals[key] + parseFloat(value);
-						
+			weeklyOverallTotal = weeklyOverallTotal + parseFloat(value);
 			
 		});
 		
@@ -1322,6 +1326,7 @@ $_SESSION[$sessionID] = $sessionID;
 				textTotals = textTotals + '<tr><td>' +  key + ":" + totals[key] + " hours</td></tr>";
 			}		
 			
+			textTotals = textTotals + "<tr><td> Overall Hours: "  + weeklyOverallTotal + " hours </td></tr>";
 			textTotals = textTotals + "<tr><td> Please double click to hide.</td></tr></table>";
 			
 			$("#textTotals").html(textTotals);
