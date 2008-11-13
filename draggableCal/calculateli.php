@@ -1612,8 +1612,6 @@ li {
 
 <tr>
 	<td>
-		Select users from dropdown list and then select a date.
-		You can add new users in the text field, just then press enter. 
 		<div id=userName>
 			<select id=userNameInput>
 				
