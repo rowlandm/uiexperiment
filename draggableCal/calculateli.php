@@ -27,36 +27,95 @@ $_SESSION[$sessionID] = $sessionID;
   	
   	function sendEmailDaily(actionDayChosen,el){
   	
+			  	
+  	
+ 	
   		// actionDayChosen is tuesday24-10-2008
-  		var emailToAddress = prompt("Which email address would you like it sent to?","katina.omeros@celentia.com");
+  		// var emailToAddress = prompt("Which email address would you like it sent to?","katina.omeros@celentia.com");
   		// var emailToAddress = prompt("Which email address would you like it sent to?","rowland.mosbergen@gmail.com");
   		
-  		if (emailToAddress != null) {
   		
-	  		var emailDefault = $('#userNameInput').val() + '@celentia.com';
-	  		var emailFromAddress = prompt("Which email address would you like it sent from?",emailDefault);
-	
-			// eg. OVH:9 hours;GCMIA:4 hours;
-			var details = calculateTotals(actionDayChosen,el,false);
-
-			if (emailFromAddress != null) {
-					
-				var postData = 'emailFromAddress=' + emailFromAddress + '&dataDetails=' + details  + '&emailToAddress=' + emailToAddress   + '&actionDayChosen=' + actionDayChosen
-		        			 + '&action=emailDaily' + '&sessionid=<?php echo $sessionID ?>';  
+  		
+		// clear out any old input divs
+		$("#inputEmailDiv").remove();	
+			
+		var emailDefault = $('#userNameInput').val() + '@celentia.com';	
 		
-				// $('#overCalendar').append(postData);
-				
-				$.ajax({
-					type: "POST",
-				   	url: "ajaxcal.php",
-				   	data: postData,
-				   	success: function(msg){
-						alert(msg);   		
-		  			}
-		  		});
-		  		
-			} // if emailFromAddress not null  	
-		} // if emailToaddress not null 	
+		// eg. OVH:9 hours;GCMIA:4 hours;
+		var details = calculateTotals(actionDayChosen,el,false);
+		
+		// var extraDetails = prompt("Edit Details",details);
+	
+		
+		
+			
+		var newInputEmailDiv = '<div id="inputEmailDiv" style="position:absolute; top:55; left:44;">' +
+		' <form id=formEmailSubmit>' +  
+		' <table bgcolor="#0000FF"> ' + 
+		' <tr><td id=inputEmailDivTitle color="#FFFFFF">Send Email</td></tr> ' + 
+		' <tr><td bgcolor="#8888FF">Email To:</td><td> <input name=emailToAddress size=60 type=text value=katina.omeros@celentia.com> </td></tr> ' + 
+		' <tr><td bgcolor="#8888FF">Email From:</td><td> <input name=emailFromAddress size=60 type=text value=' + emailDefault + '> </td></tr> ' +
+		' <tr><td bgcolor="#8888FF">Message:</td><td> <textarea name=dataDetails rows=10 cols=46>' + details + '</textarea> </td></tr> ' +
+		' <tr><td colspan=2 bgcolor="#8888FF"><input type=submit id=inputEmailSubmit value=Submit ><input type=submit id=cancelEmailSubmit value=Cancel </td></tr> ' +
+		' </table></form></div> ';
+		
+		$('#overCalendar').append(newInputEmailDiv);
+		
+		$("#inputEmailDiv").show().css("width","500px").draggable().css("top",380).css("left",500);
+									
+		$('#inputEmailSubmit').click(function(){
+			
+			event.preventDefault();
+			
+			$("#inputEmailDiv").hide();	
+			
+			var postData = $("#formEmailSubmit").serialize();
+			
+			postData = postData + '&actionDayChosen=' + actionDayChosen + '&action=emailDaily' + '&sessionid=<?php echo $sessionID ?>';  
+	
+			$.ajax({
+				type: "POST",
+			   	url: "ajaxcal.php",
+			   	data: postData,
+			   	success: function(msg){
+					alert(msg);   		
+	  			}
+	  		});			
+			
+			
+		
+		});		
+		
+		
+		$('#cancelEmailSubmit').click(function(){
+			$("#inputEmailDiv").hide();	
+			event.preventDefault();
+		
+		});	
+		
+    	$('#inputEmailDiv :input:visible:enabled[@type=text]').keyup(function(e) {
+						
+			if(e.keyCode == 27) {
+				$('#cancelEmailSubmit').click();
+			}
+	
+		
+			//alert(e.keyCode);
+			if(e.keyCode == 13) {
+				$('#inputEmailSubmit').click();
+			}
+		});
+	
+		
+		
+	
+		
+    	
+    		
+    		
+
+
+
   	
   	}
   	
@@ -70,7 +129,7 @@ $_SESSION[$sessionID] = $sessionID;
 		*/
 		
 		var start = '05:45';
-		var end = '18:00';
+		var end = '20:00';
 		var slots = '15';
 		
 		
