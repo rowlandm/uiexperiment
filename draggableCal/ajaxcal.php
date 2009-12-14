@@ -200,7 +200,7 @@ switch ($action){
 			$err = $DB->ErrorMsg();
 			die($err);
 		}	
-		
+		$returnList = '';
 		if ($results->RecordCount() > 0) {
 			while ($row = $results->fetchRow()) {
 				$returnList .= $row['username'].",";
@@ -324,39 +324,33 @@ switch ($action){
 		// check the session ID first
 		$sessionIDReceived = $_POST['sessionid'];
 		
-		session_start();
 		
-		// $_SESSION['session_id'] = session_id();
-		if (session_is_registered($sessionIDReceived)){ 
 			
-			// unsure about security implications
-			
-			$emailFromAddress = $_POST['emailFromAddress'];
-			$emailToAddress = $_POST['emailToAddress'];
-			$actionDayChosen = $_POST['actionDayChosen']; // format actionDayChosen is tuesday24-10-2008
-			$dataDetails = $_POST['dataDetails']; //format eg. OVH:9 hours;GCMIA:4 hours;
+		// unsure about security implications
+		
+		$emailFromAddress = $_POST['emailFromAddress'];
+		$emailToAddress = $_POST['emailToAddress'];
+		$actionDayChosen = $_POST['actionDayChosen']; // format actionDayChosen is tuesday24-10-2008
+		$dataDetails = $_POST['dataDetails']; //format eg. OVH:9 hours;GCMIA:4 hours;
+
+
+		$dataDetails = str_replace(";","\n\n",$dataDetails);
+		
+		$body = str_replace(":","\n",$dataDetails);
+		
+
+		
+		
+		$subject = "Timesheet - ". substr($actionDayChosen,0,-10) . '  '. substr($actionDayChosen,-10);
+		
+		$headers = 'From: ' . $emailFromAddress.  "\r\n";
+		$headers .= 'Cc: ' . $emailFromAddress . "\r\n"; 
+		
+		mail($emailToAddress,$subject,$body,$headers);
+		
+		
+		echo 'Email successfully sent';
 	
-	
-			$dataDetails = str_replace(";","\n\n",$dataDetails);
-			
-			$body = str_replace(":","\n",$dataDetails);
-			
-	
-			
-			
-			$subject = "Timesheet - ". substr($actionDayChosen,0,-10) . '  '. substr($actionDayChosen,-10);
-			
-			$headers = 'From: ' . $emailFromAddress.  "\r\n";
-			$headers .= 'Cc: ' . $emailFromAddress . "\r\n"; 
-			
-			mail($emailToAddress,$subject,$body,$headers);
-			
-			
-			echo 'Email successfully sent';
-		}
-		else {
-			echo " Email not sent due to security reasons";
-		}
 		
 		
 	break;
