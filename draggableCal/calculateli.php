@@ -312,9 +312,9 @@ $_SESSION[$sessionID] = $sessionID;
 									var newInputDiv = '<div id="inputDiv" style=" position:absolute; top:55; left:44;">' + 
 									' <table bgcolor="#0000FF"> ' + 
 									' <tr><td id=inputDivTitle color="#FFFFFF">Details</td></tr> ' + 
-									' <tr><td bgcolor="#8888FF">Name:</td><td> <input id=inputName type=text> </td></tr> ' + 
-									' <tr><td bgcolor="#8888FF">Type:</td><td> <input id=inputType type=text> </td></tr> ' +
-									' <tr><td bgcolor="#8888FF">Job:</td><td> <input id=inputCode type=text> </td></tr> ' +
+									' <tr><td bgcolor="#8888FF">Name:</td><td> <input id=inputName type=text> ' + 
+									' <input id=inputType type=hidden> ' +
+									' <input id=inputCode type=hidden> </td>' +
 									' <tr><td bgcolor="#8888FF">Details:</td><td> <textarea id=inputDetails></textarea> </td></tr> ' +
 									' <tr><td colspan=2 bgcolor="#8888FF"><input type=submit id=inputSubmit value=Submit ><input type=submit id=cancelSubmit value=Cancel </td></tr> ' +
 									' </table></div> ';
@@ -688,9 +688,9 @@ $_SESSION[$sessionID] = $sessionID;
 			var newInputDiv = '<div id="inputDiv" style="position:absolute; top:55; left:44;">' + 
 			' <table bgcolor="#0000FF"> ' + 
 			' <tr><td id=inputDivTitle color="#FFFFFF">Details</td></tr> ' + 
-			' <tr><td bgcolor="#8888FF">Name:</td><td> <input id=inputName type=text> </td></tr> ' + 
-			' <tr><td bgcolor="#8888FF">Type:</td><td> <input id=inputType type=text> </td></tr> ' +
-			' <tr><td bgcolor="#8888FF">Job:</td><td> <input id=inputCode type=text> </td></tr> ' +
+			' <tr><td bgcolor="#8888FF">Name:</td><td> <input id=inputName type=text> ' + 
+			' <input id=inputType type=hidden> ' +
+			' <input id=inputCode type=hidden> </td>' +
 			' <tr><td bgcolor="#8888FF">Details:</td><td> <textarea id=inputDetails></textarea> </td></tr> ' +
 			' <tr><td colspan=2 bgcolor="#8888FF"><input type=submit id=inputSubmit value=Submit ><input type=submit id=cancelSubmit value=Cancel </td></tr> ' +
 			' </table></div> ';
@@ -1340,7 +1340,7 @@ $_SESSION[$sessionID] = $sessionID;
 			var spanValues = $(this).text().split(";");
 			
 			// the job code is set to the 8th element of the span
-			var key = spanValues[7];
+			var key = spanValues[0];
 			var value = spanValues[3];
 			
 			
