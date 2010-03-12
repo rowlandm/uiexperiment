@@ -212,6 +212,32 @@ switch ($action){
 		
 	break;	
 	
+	case "listAllProjects":
+		
+		
+		$returnUserNamesQuery = 'SELECT appt_name, SUM( TIMESTAMPDIFF( 
+			MINUTE , appt_start, appt_end ) /60 ) /8 AS person_days, SUM( TIMESTAMPDIFF( 
+			MINUTE , appt_start, appt_end ) /60 ) /8 *800 AS max_client_cost
+			FROM  `appointments` 
+			GROUP BY appt_name
+			ORDER BY person_days DESC';
+		
+		$results = $DB->Execute($returnUserNamesQuery);
+		if (!$results) {
+			$err = $DB->ErrorMsg();
+			die($err);
+		}	
+		
+		if ($results->RecordCount() > 0) {
+			while ($row = $results->fetchRow()) {
+				$returnList .= $row['appt_name']."::".round($row['person_days'],2)."::".number_format($row['max_client_cost'],2).";";
+			}
+		}
+		$returnList = substr($returnList,0,-1);
+		
+		echo $returnList;
+		
+	break;		
 	
 	
 	case "resize":

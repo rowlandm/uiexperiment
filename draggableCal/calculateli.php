@@ -1610,6 +1610,66 @@ $_SESSION[$sessionID] = $sessionID;
 
 		//initial refresh with 7 days
 		refreshCalendar(7);
+
+		$('#listAllProjects').click(function(){
+			var postData = 'action=listAllProjects';  
+	        
+	        
+	        // initialise the calendar
+			// call ajax from the database to return the records and use them to create events
+	  		$.ajax({
+				type: "POST",
+			   	url: "ajaxcal.php",
+			   	data: postData,
+			   	success: function(msg){
+
+	  			
+					var newDivProjects = '<div id="newDivProjects" style="border:10px solid #225DA1;position:absolute; background:#225DA1; color:black;left:0;top:0;" >';
+					newDivProjects = newDivProjects + '<a href="#" id="closeWindow" style="float:right;color:white">X</a><div style="clear:right"></div>';
+					newDivProjects = newDivProjects + '<table border=1 cellpadding=2 cellspacing=0 bordercolor=#225DA1 bgcolor="D3DFED">';
+					newDivProjects = newDivProjects + '<tr>';
+					newDivProjects = newDivProjects + '<td style="color:#000">Project</td>';
+					newDivProjects = newDivProjects + '<td style="color:#000">Person Days</td>';
+					newDivProjects = newDivProjects + '<td style="color:#000">Max cost</td>';
+					newDivProjects = newDivProjects + '</tr>';
+				
+
+					
+					var projects = msg.split(';');
+					
+					if (projects.length > 0 ){
+					
+						for (key in projects){
+
+							var details = projects[key].split('::');
+							
+							newDivProjects = newDivProjects + '<tr>';
+
+							for (i in details){
+								
+								newDivProjects = newDivProjects + '<td color="#FFFFFF">'+ details[i] +'</td>';
+																
+							}
+							
+							newDivProjects = newDivProjects + '</tr>';
+			   			}
+
+						newDivProjects = newDivProjects + '</table>';
+						
+						$("#overCalendar").append(newDivProjects);
+
+						$('#newDivProjects').draggable();
+						$('#closeWindow').click(function (){ $('#newDivProjects').hide();});
+						
+			   		} else {
+				   		alert('Error in processing list of projects');
+			   		}
+			   		
+			   		
+			   		
+			   	}
+			});
+		});
 		
   	});
   	</script>
@@ -1666,7 +1726,7 @@ li {
 <body>
 
 
-
+<a href="#" id="listAllProjects">List all projects</a>
 <table>
 
 <tr>
