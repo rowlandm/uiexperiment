@@ -215,11 +215,13 @@ switch ($action){
 	case "listAllProjects":
 		
 		
+		$projectQuery = ($project == "")? '': ' WHERE appt_name ="' .$project. '" ';
+		
 		$returnUserNamesQuery = 'SELECT appt_name, SUM( TIMESTAMPDIFF( 
 			MINUTE , appt_start, appt_end ) /60 ) /8 AS person_days, SUM( TIMESTAMPDIFF( 
 			MINUTE , appt_start, appt_end ) /60 ) /8 *800 AS max_client_cost
-			FROM  `appointments` 
-			GROUP BY appt_name
+			FROM  `appointments` '.$projectQuery.
+			' GROUP BY appt_name
 			ORDER BY person_days DESC';
 		
 		$results = $DB->Execute($returnUserNamesQuery);

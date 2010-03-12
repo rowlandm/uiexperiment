@@ -1211,6 +1211,73 @@ $_SESSION[$sessionID] = $sessionID;
 				calculateTotals('weekly',el,true);
 														
 			}	
+
+			if (action == "projectTotal"){
+
+				
+				var test = el.children('span.hideData').html();
+				var temp = test.split(';');
+				var projectName = temp[0];
+				var postData = 'action=listAllProjects&project='+projectName;  
+
+		        // initialise the calendar
+				// call ajax from the database to return the records and use them to create events
+		  		$.ajax({
+					type: "POST",
+				   	url: "ajaxcal.php",
+				   	data: postData,
+				   	success: function(msg){
+
+		  				var topOffset  = pos.docY - 890; 
+						var leftOffset = pos.docX - 440; 
+
+						var newDivProjects = '<div id="newDivProjects" style="width:220px;border:10px solid #225DA1;position:relative; background:#225DA1; color:black;" >';
+						newDivProjects = newDivProjects + '<a href="#" id="closeWindow" style="float:right;color:white">X</a><div style="clear:right"></div>';
+						newDivProjects = newDivProjects + '<table border=1 cellpadding=2 cellspacing=0 bordercolor=#225DA1 bgcolor="D3DFED">';
+						newDivProjects = newDivProjects + '<tr>';
+						newDivProjects = newDivProjects + '<td style="color:#000">Project</td>';
+						newDivProjects = newDivProjects + '<td style="color:#000">Person Days</td>';
+						newDivProjects = newDivProjects + '<td style="color:#000">Max cost</td>';
+						newDivProjects = newDivProjects + '</tr>';
+					
+						var projects = msg.split(';');
+						
+						if (projects.length > 0 ){
+						
+							for (key in projects){
+
+								var details = projects[key].split('::');
+								
+								newDivProjects = newDivProjects + '<tr>';
+
+								for (i in details){
+									
+									newDivProjects = newDivProjects + '<td color="#FFFFFF">'+ details[i] +'</td>';
+																	
+								}
+								
+								newDivProjects = newDivProjects + '</tr>';
+				   			}
+
+							newDivProjects = newDivProjects + '</table>';
+							
+							$("#overCalendar").append(newDivProjects);
+
+							$('#newDivProjects').draggable().css('top',topOffset).css('left',leftOffset);
+							$('#closeWindow').click(function (){ $('#newDivProjects').remove();});
+							
+				   		} else {
+					   		alert('Error in processing list of projects');
+				   		}
+				   		
+				   		
+				   		
+				   	}
+				});				
+								
+														
+			}
+			
 			if (action == "refresh"){
 
 				refreshCalendarEvents();
@@ -1769,6 +1836,7 @@ li {
 	<li class="showDetails"><a href="#showDetails">Show Details</a></li>
 	<li class="dailyTotals"><a href="#dailyTotals">Daily Totals</a></li>
 	<li class="weeklyTotals"><a id=weeklyTotals href="#weeklyTotals">Weekly Totals</a></li>
+	<li class="weeklyTotals"><a id=projectTotal href="#projectTotal">Project Total</a></li>
 	<li class="edit"><a href="#edit">Edit</a></li>
 	<li class="refresh" id=refreshMenu><a href="#refresh">Refresh</a></li>
 	<li class="emailDaily" ><a href="#emailDaily">Email Daily</a></li>
