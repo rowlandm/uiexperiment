@@ -53,7 +53,7 @@ $_SESSION[$sessionID] = $sessionID;
 		' <form id=formEmailSubmit>' +  
 		' <table bgcolor="#0000FF"> ' + 
 		' <tr><td id=inputEmailDivTitle color="#FFFFFF">Send Email</td></tr> ' + 
-		' <tr><td bgcolor="#8888FF">Email To:</td><td> <input name=emailToAddress size=60 type=text value=katina.omeros@celentia.com> </td></tr> ' + 
+		' <tr><td bgcolor="#8888FF">Email To:</td><td> <input name=emailToAddress size=60 type=text value=timesheets@celentia.com> </td></tr> ' + 
 		' <tr><td bgcolor="#8888FF">Email From:</td><td> <input name=emailFromAddress size=60 type=text value=' + emailDefault + '> </td></tr> ' +
 		' <tr><td bgcolor="#8888FF">Message:</td><td> <textarea name=dataDetails rows=10 cols=46>' + details + '</textarea> </td></tr> ' +
 		' <tr><td colspan=2 bgcolor="#8888FF"><input type=submit id=inputEmailSubmit value=Submit ><input type=submit id=cancelEmailSubmit value=Cancel </td></tr> ' +
