@@ -1,12 +1,38 @@
 <?php
 
+if (!class_exists('DateTime')) {
+	class DateTime {
+		public $date;
+		
+		public function __construct($date) {
+			$this->date = strtotime($date);
+		}
+		
+		public function setTimeZone($timezone) {
+			return;
+		}
+		
+		private function __getDate() {
+			return date(DATE_ATOM, $this->date);    
+		}
+		
+		public function modify($multiplier) {
+			$this->date = strtotime($this->__getDate() . ' ' . $multiplier);
+		}
+		
+		public function format($format) {
+			return date($format, $this->date);
+		}
+	}
+}
+
 include('adodb/adodb.inc.php');
 include("adodb/adodb-active-record.inc.php");
 require_once('time.lib.php');
 
-$server = 'cel-bne-dev1';
-$user = 'uiexperiment';
-$pwd = 'p878p';
+$server = 'ncascr-dev';
+$user = 's2776403';
+$pwd = 'temp211';
 $db = 'uiexperiment';
 $DB = NewADOConnection('mysql');
 $DB->Connect($server, $user, $pwd, $db);
