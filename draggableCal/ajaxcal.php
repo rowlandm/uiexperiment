@@ -31,7 +31,7 @@ include("adodb/adodb-active-record.inc.php");
 require_once('time.lib.php');
 
 $server = 'ncascr-dev';
-$user = 's2776403';
+$user = 'uiexperiment';
 $pwd = 'temp211';
 $db = 'uiexperiment';
 $DB = NewADOConnection('mysql');
