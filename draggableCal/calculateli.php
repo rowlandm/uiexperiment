@@ -1218,7 +1218,7 @@ $_SESSION[$sessionID] = $sessionID;
 				var test = el.children('span.hideData').html();
 				var temp = test.split(';');
 				var projectName = temp[0];
-				var postData = 'action=listAllProjects&project='+projectName;  
+				var postData = 'action=listAllProjects&project='+projectName+'&username='+$('#userNameInput').val();  
 
 		        // initialise the calendar
 				// call ajax from the database to return the records and use them to create events
@@ -1679,7 +1679,7 @@ $_SESSION[$sessionID] = $sessionID;
 		refreshCalendar(7);
 
 		$('#listAllProjects').click(function(){
-			var postData = 'action=listAllProjects';  
+			var postData = 'action=listAllProjects'+'&username='+$('#userNameInput').val();  
 	        
 	        
 	        // initialise the calendar

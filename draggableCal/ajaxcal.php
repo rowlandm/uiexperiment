@@ -240,13 +240,15 @@ switch ($action){
 	
 	case "listAllProjects":
 		
-		
-		$projectQuery = ($project == "")? '': ' WHERE appt_name ="' .$project. '" ';
+		$project = $_POST['project'];
+		$username = $_POST['username'];
+				
+		$projectQuery = ($project == "")? '': ' AND appt_name ="' .$project. '" ';
 		
 		$returnUserNamesQuery = 'SELECT appt_name, SUM( TIMESTAMPDIFF( 
-			MINUTE , appt_start, appt_end ) /60 ) /8 AS person_days, SUM( TIMESTAMPDIFF( 
-			MINUTE , appt_start, appt_end ) /60 ) /8 *800 AS max_client_cost
-			FROM  `appointments` '.$projectQuery.
+			MINUTE , appt_start, appt_end ) /60 ) /7.25 AS person_days, SUM( TIMESTAMPDIFF( 
+			MINUTE , appt_start, appt_end ) /60 ) /7.25 * 725 AS max_client_cost
+			FROM  `appointments` WHERE username = "'. $username.'"'.$projectQuery.
 			' GROUP BY appt_name
 			ORDER BY person_days DESC';
 		
