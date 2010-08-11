@@ -36,7 +36,7 @@ $pwd = 'temp211';
 $db = 'uiexperiment';
 $DB = NewADOConnection('mysql');
 $DB->Connect($server, $user, $pwd, $db);
-
+$hourlyRate = 100; // $ per hour
 
 $username = $_POST['username'];
 $action = $_POST['action'];
@@ -246,11 +246,10 @@ switch ($action){
 		$projectQuery = ($project == "")? '': ' AND appt_name ="' .$project. '" ';
 		
 		$returnUserNamesQuery = 'SELECT appt_name, SUM( TIMESTAMPDIFF( 
-			MINUTE , appt_start, appt_end ) /60 ) /7.25 AS person_days, SUM( TIMESTAMPDIFF( 
-			MINUTE , appt_start, appt_end ) /60 ) /7.25 * 725 AS max_client_cost
+			MINUTE , appt_start, appt_end ) /60 ) + 0.25 AS person_hours 
 			FROM  `appointments` WHERE username = "'. $username.'"'.$projectQuery.
 			' GROUP BY appt_name
-			ORDER BY person_days DESC';
+			ORDER BY person_hours DESC';
 		
 		$results = $DB->Execute($returnUserNamesQuery);
 		if (!$results) {
@@ -260,7 +259,7 @@ switch ($action){
 		
 		if ($results->RecordCount() > 0) {
 			while ($row = $results->fetchRow()) {
-				$returnList .= $row['appt_name']."::".round($row['person_days'],2)."::".number_format($row['max_client_cost'],2).";";
+				$returnList .= $row['appt_name']."::".round($row['person_hours']/7.25,2)."::".number_format($row['person_hours']*$hourlyRate,2).";";
 			}
 		}
 		$returnList = substr($returnList,0,-1);
