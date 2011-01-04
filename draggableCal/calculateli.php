@@ -8,8 +8,6 @@ $sessionID = session_id();
 $_SESSION[$sessionID] = $sessionID;
 
 
-echo $_GET['interval'];
-echo $_GET['username'];
 
 //temp, 2b filled from db
 //$blockedArray = array("10:30","13:00")
