@@ -8,6 +8,9 @@ $sessionID = session_id();
 $_SESSION[$sessionID] = $sessionID;
 
 
+echo $_GET['interval'];
+echo $_GET['username'];
+
 //temp, 2b filled from db
 //$blockedArray = array("10:30","13:00")
 ?>
@@ -44,7 +47,9 @@ $_SESSION[$sessionID] = $sessionID;
     
     slots = new Slots;
     
-    slots.setSlotInterval('15');
+    
+    
+    slots.setSlotInterval('<?php if (is_numeric($_GET['interval'])){ echo $_GET['interval']; } else { echo '15';} ?>');
     
     
     
@@ -1120,9 +1125,11 @@ $_SESSION[$sessionID] = $sessionID;
 		var newDivSave = '<div id="' + parent + txtStart + '" class = "savedDiv" >';
                     
                     
+        var tempMinutes = Math.round((count * slots.hourDiv - (Math.floor(count * slots.hourDiv ))) * 60);
+                    
 		// the ; is important as it is used as a delimiter to calculate stuff later on
 		newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle'  + parent + txtStart + '><img height=10px src="images/zaneinthebaththumb.png"></div>';
-		newDivSave = newDivSave + '<span id=' + parent + txtStart + 'display > ' + name + ' Duration: ' + Math.round(count * slots.hourDiv *100)/100 + '</span>';
+		newDivSave = newDivSave + '<span id=' + parent + txtStart + 'display > ' + name + ' Duration: ' + Math.floor(count * slots.hourDiv ) + 'hr '  + tempMinutes  + 'min</span>';
 		newDivSave = newDivSave + '<span id=' 
 					+ parent + txtStart + 'data class=hideData style="visible: hidden">' + name + ';' + start + ';' 
 					+ end + ';' + count * slots.hourDiv + ';' + count + ';' + parent + ';' 
@@ -1673,7 +1680,7 @@ $_SESSION[$sessionID] = $sessionID;
 		   		}
 		   		
 		   		
-		   		
+		   		$('#userNameInput option[value=<?php echo $_GET['username']; ?>]').attr('selected', 'selected');
 		   	}
 		});
 		   		
@@ -1693,6 +1700,9 @@ $_SESSION[$sessionID] = $sessionID;
 			
 		});
 
+        
+        
+        
 		//initial refresh with 7 days
 		refreshCalendar(7);
 
@@ -1829,8 +1839,8 @@ li {
 		</div>
         <div id=minuteChooser> 
 			<select id=minuteChooserSelect>
-                <option value="5" selected>5 minute increments</option>
-                <option value="15" >15 minute increments</option>
+                <option value="5" >5 minute increments</option>
+                <option value="15" selected>15 minute increments</option>
                 
             </select>
 		</div>
