@@ -25,6 +25,29 @@ $_SESSION[$sessionID] = $sessionID;
 <script type="text/javascript" src="json.js"></script> 
 <script>
   	
+    var start = '05:45';
+	var end = '20:00';
+    
+    var liHeight = 15; // always 15 px high 
+    
+    // class for slots
+    function Slots(){
+        
+    }
+    Slots.prototype.setSlotInterval = function(interval){
+        this.interval = interval;
+        this.intervalInt = parseFloat(this.interval);
+        this.hourDiv = this.intervalInt / 60;
+        this.rounding = 2;
+        
+    }
+    
+    slots = new Slots;
+    
+    slots.setSlotInterval('15');
+    
+    
+    
   	function sendEmailDaily(actionDayChosen,el){
   	
 			  	
@@ -107,16 +130,6 @@ $_SESSION[$sessionID] = $sessionID;
 		});
 	
 		
-		
-	
-		
-    	
-    		
-    		
-
-
-
-  	
   	}
   	
   	
@@ -128,9 +141,6 @@ $_SESSION[$sessionID] = $sessionID;
 		$slots = "15";
 		*/
 		
-		var start = '05:45';
-		var end = '20:00';
-		var slots = '15';
 		
 		
 		
@@ -146,8 +156,8 @@ $_SESSION[$sessionID] = $sessionID;
 			
 		}
 		
-		var postData = 'username='+ $('#userNameInput').val() + '&showNumDays=' + showNumDays   + '&dateInWeek=' + dateInWeek
-        			+ '&start=' + start + '&end=' + end + '&slots=' + slots  + '&action=returnInitialHTML';  
+        var postData = 'username='+ $('#userNameInput').val() + '&showNumDays=' + showNumDays   + '&dateInWeek=' + dateInWeek
+        			+ '&start=' + start + '&end=' + end + '&slots=' + slots.interval  + '&action=returnInitialHTML';  
         
         
         // initialise the calendar
@@ -223,7 +233,7 @@ $_SESSION[$sessionID] = $sessionID;
 		       		// this is what to do when you are selecting
 		       		// want to stop li's with class of saved from being selected
 		       		// as they have already been selected.
-		       		selecting: function(ev, ui) {
+		       		selecting: function(ev, ui) {slots.hourDiv
 		
 		               if ($(ui.selecting).hasClass("saved")){
 		               		// can we stop it from being selected?     
@@ -285,14 +295,14 @@ $_SESSION[$sessionID] = $sessionID;
 		                    
 		                    
 		                    diffhours = diffms / (1000 * 60 * 60); 
-		                    diffhours = diffhours + 0.25;
+		                    diffhours = diffhours + slots.hourDiv;
 		                    
-		                    expectantCount = diffhours / 0.25; 
+		                    expectantCount = diffhours / slots.hourDiv; 
 		                    
 		                    
 		                    
 		                    // check that there the difference between the start and end times match up to the number of counts we expect
-		                    if (expectantCount != count){
+		                    if (Math.round(expectantCount,0) != count){
 								alert ("Invalid selection.");
 								// reset all the selections if invalid selection
 		    	                collection.each(function() {
@@ -807,7 +817,7 @@ $_SESSION[$sessionID] = $sessionID;
 			09-30	save 09-00		save 09-00 		
 			09-45	save 09-00		save 09-00 		
 			10-00
-			
+			: 
 			
 			PROBLEM when resizing to down to 1 element,
 			have to reset the droppable handle div and background color
@@ -823,7 +833,7 @@ $_SESSION[$sessionID] = $sessionID;
 		
 					
 		var diffHeight = parseFloat(ui.element.height()) - parseFloat(ui.originalSize.height);
-		var diffCount = diffHeight / 15;
+		var diffCount = diffHeight / liHeight;
 		var diffRoundCount = Math.round(diffCount) ; // 15 is the height of the li's and rounds it
 		
 		
@@ -986,11 +996,11 @@ $_SESSION[$sessionID] = $sessionID;
 			spanValues[2] = newEnd; 
 			
 			// -  the duration
-			spanValues[3] = 0.25 * newCount;
+			spanValues[3] = slots.hourDiv * newCount;
 			
 			
 			// - the height of the div
-			var newHeight = (newCount * 15) - 2; // the 2px is for the border at the bottom 
+			var newHeight = (newCount * liHeight) - 2; // the 2px is for the border at the bottom 
 			ui.element.height(newHeight + 'px');
 			
 			/* ui.element					
@@ -1001,7 +1011,7 @@ $_SESSION[$sessionID] = $sessionID;
 			
 			
 			
-			var oldDuration = oldCount * 0.25;
+			var oldDuration = oldCount * slots.hourDiv;
 			
 			$('#' + parent + txtStart + 'display').text(spanValues[0] + ' Duration: ' + spanValues[3]);
 			
@@ -1104,7 +1114,7 @@ $_SESSION[$sessionID] = $sessionID;
 		var offset = collection.eq(0).offset();
 		
 		// the 15 is for the height of each li and the -2 is to take into account the 2px bottom line -- Firefox and chrome
-		var newHeight = (count * 15) - 2; 
+		var newHeight = (count * liHeight) - 2; 
 		
 		
 		var newDivSave = '<div id="' + parent + txtStart + '" class = "savedDiv" >';
@@ -1112,10 +1122,10 @@ $_SESSION[$sessionID] = $sessionID;
                     
 		// the ; is important as it is used as a delimiter to calculate stuff later on
 		newDivSave = newDivSave + '<div style="background:red; height=10px;" id=handle'  + parent + txtStart + '><img height=10px src="images/zaneinthebaththumb.png"></div>';
-		newDivSave = newDivSave + '<span id=' + parent + txtStart + 'display > ' + name + ' Duration: ' + count * 0.25 + '</span>';
+		newDivSave = newDivSave + '<span id=' + parent + txtStart + 'display > ' + name + ' Duration: ' + Math.round(count * slots.hourDiv *100)/100 + '</span>';
 		newDivSave = newDivSave + '<span id=' 
 					+ parent + txtStart + 'data class=hideData style="visible: hidden">' + name + ';' + start + ';' 
-					+ end + ';' + count * 0.25 + ';' + count + ';' + parent + ';' 
+					+ end + ';' + count * slots.hourDiv + ';' + count + ';' + parent + ';' 
 					+ inputType + ';' + inputCode+ ';' + inputDetails + '</span>'; 
 		newDivSave = newDivSave + '</div>';	
                     
@@ -1675,6 +1685,14 @@ $_SESSION[$sessionID] = $sessionID;
 		});
 
 
+        $('#minuteChooserSelect').change(function () {
+            
+            slots.setSlotInterval($(this).val());
+            
+			refreshCalendar($('#showNumDays').val());  
+			
+		});
+
 		//initial refresh with 7 days
 		refreshCalendar(7);
 
@@ -1802,13 +1820,19 @@ li {
 			<select id=userNameInput>
 				
 					
-					<!--   <option value=corey.evans>corey.evans</option> -->
 			</select>
 			<br>
 			Add new User: <input type=text id=newUser></input>
 		</div>	
 		<div id=inlineDatePicker> 
 			<input type=hidden id=dateChosen></input>
+		</div>
+        <div id=minuteChooser> 
+			<select id=minuteChooserSelect>
+                <option value="5" selected>5 minute increments</option>
+                <option value="15" >15 minute increments</option>
+                
+            </select>
 		</div>
 		<div id=otherChoices>
 			<input type=hidden id=showNumDays value=7></input>
@@ -1832,6 +1856,7 @@ li {
 
 
 
+ 
 <ul id="savedDivMenu" class="contextMenu">
 	<li class="showDetails"><a href="#showDetails">Show Details</a></li>
 	<li class="dailyTotals"><a href="#dailyTotals">Daily Totals</a></li>

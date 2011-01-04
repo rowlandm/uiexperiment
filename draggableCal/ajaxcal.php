@@ -30,7 +30,7 @@ include('adodb/adodb.inc.php');
 include("adodb/adodb-active-record.inc.php");
 require_once('time.lib.php');
 
-$server = 'ncascr-dev';
+$server = 'ncascr-dev.rcs.griffith.edu.au';
 $user = 'uiexperiment';
 $pwd = 'temp211';
 $db = 'uiexperiment';
